@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+  db:
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    volumes:
+      - ./db:/data/db  
+  server:
+    image: node:19.0.0-alpine
+    working_dir: /home/node
+    ports:
+      - 3000:3000
+    command: sh -c "npm install && npm run start:dev"
+    environment:
+      - MONGO_URL=mongodb://db:27017/my-nest-db?authSource=admin
+    volumes:
+      - ./server:/home/node
+    depends_on:
+      - db
+
+  client:
+    image: node:19.0.0-alpine
+    working_dir: /home/node
+    ports:
+      - 3001:3001
+    volumes:
+      - ./client:/home/node
+    command: sh -c "npm install && npm run dev"
+    environment:
+      - VITE_API_URL=http://localhost:3000
+      - CLIENT_PORT=3001
+      - CLIENT_HOST=0.0.0.0
+      
+volumes:
+  db: {}
