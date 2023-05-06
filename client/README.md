@@ -1,35 +1,24 @@
-# vue-project
+# esgi-react-exercise-1
 
-This template should help get you started developing with Vue 3 in Vite.
+## Requirements
 
-## Recommended IDE Setup
+- Docker
+- Docker Compose
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+## Services startup
 
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
+```bash
+docker-compose up --detach
 ```
 
-### Compile and Hot-Reload for Development
+## Dependencies installation
 
-```sh
-npm run dev
+```bash
+docker-compose exec node npm install
 ```
 
-### Compile and Minify for Production
+## Development server
 
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
+```bash
+docker-compose exec node npm run development
 ```

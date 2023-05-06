@@ -24,12 +24,12 @@ services:
     image: node:19.0.0-alpine
     working_dir: /home/node
     ports:
-      - 3001:3001
+      - 8000:8000
     volumes:
       - ./client:/home/node
-    command: sh -c "npm install && npm run dev"
+    command: sh -c "npm install && npm run development"
     environment:
-      - VITE_API_URL=http://localhost:3000
+      - REACT_API_URL=http://localhost:3000
       - CLIENT_PORT=3001
       - CLIENT_HOST=0.0.0.0
       

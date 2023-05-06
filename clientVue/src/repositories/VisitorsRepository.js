@@ -1,4 +1,4 @@
-import * as Request from '../services//Request';
+import * as Request from '../services/Request';
 
 export default class VisitorsRepository {
     static async getVisitors() {

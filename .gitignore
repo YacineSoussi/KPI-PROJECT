@@ -1,3 +1,4 @@
+.DS_Store
 .node_repl_history
 .npm
 db
@@ -5,3 +6,5 @@ db/diagnostic.data/metrics.interim
 db/journal/WiredTigerLog.0000000008
 db/WiredTiger.turtle
 db/WiredTiger.wt
+
+client/node_modules
