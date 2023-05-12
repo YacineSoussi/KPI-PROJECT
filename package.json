@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/YacineSoussi/KPI-PROJECT/issues"
   },
-  "homepage": "https://github.com/YacineSoussi/KPI-PROJECT#readme"
+  "homepage": "https://github.com/YacineSoussi/KPI-PROJECT#readme",
+  "dependencies": {
+    "@nestjs/cli": "^9.4.2"
+  }
 }

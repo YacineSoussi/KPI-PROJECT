@@ -8,3 +8,6 @@ db/WiredTiger.turtle
 db/WiredTiger.wt
 
 client/node_modules
+server/node_modules
+node_modules
+postgres
