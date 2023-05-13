@@ -46,10 +46,6 @@ const deleteCookie = (name) => {
   document.cookie = `${name}=; Max-Age=-99999999;`;
 };
 
-const generateSessionId = () => {
-  return uuidv4();
-};
-
 class TrackManager {
   constructor(apiKey) {
     this.apiKey = apiKey;
@@ -70,7 +66,7 @@ class TrackManager {
         uri: "events",
       };
       this.trackEvent({
-        uri,
+        uri: "events",
         ...eventData,
       });
     };
@@ -116,7 +112,7 @@ class TrackManager {
     const sessionCookieName = "sessionId";
     const sessionCookie = getCookie(sessionCookieName);
     let visitorId;
-
+    let sessionEnded = false;
     // Check if the visitorId cookie exists
     const visitorIdCookie = getCookie("visitorId");
     if (!visitorIdCookie) {
@@ -135,47 +131,127 @@ class TrackManager {
       setCookie(sessionCookieName, startTime);
     }
 
-    window.addEventListener("beforeunload", () => {
-      const sessionStartTime = getCookie(sessionCookieName);
-      const endTime = Date.now();
-      const sessionId = uuidv4();
+    // Variable pour compter le nombre d'onglets ouverts
+    let openTabsCount = 1;
 
-      this.trackEvent({
-        uri: "sessions",
-        data: {
-          event: "session",
-          sessionId,
-          startTime: sessionStartTime,
-          endTime,
-          duration: endTime - sessionStartTime,
-          apiKey: this.apiKey,
-          visitorId,
-        },
-      });
+    // Gestion de l'événement de changement de visibilité
+    const handleVisibilityChange = (sessionEnded) => {
+      if (document.visibilityState === "hidden") {
+        openTabsCount--;
+        if (openTabsCount === 0 && !sessionEnded) {
+          sessionEnded = true; // Prevents multiple session end events
+          const sessionStartTime = getCookie(sessionCookieName);
+          const endTime = Date.now();
+          const sessionId = uuidv4();
 
-      deleteCookie(sessionCookieName);
-    });
-  };
+          this.trackEvent({
+            uri: "sessions",
+            data: {
+              event: "session",
+              sessionId,
+              startTime: sessionStartTime,
+              endTime,
+              duration: endTime - sessionStartTime,
+              apiKey: this.apiKey,
+              visitorId,
+            },
+          });
 
-  trackFirstVisit = () => {
-    const cookieName = "mySiteFirstVisit";
-    const cookieValue = getCookie(cookieName);
+          deleteCookie(sessionCookieName);
+        }
+      } else if (document.visibilityState === "visible") {
+        openTabsCount++;
+      }
+    };
 
-    // If the cookie does not exist, set it and track the event
-    if (!cookieValue) {
-      setCookie(cookieName, "true");
+    // Encapsule handleVisibilityChange dans une fonction pour pouvoir utiliser sessionEnded
+    const handleBeforeVisibilityChangeWrapper = () => {
+      handleVisibilityChange(sessionEnded);
+    };
 
-      // Track the event using your preferred tracking method
-      this.trackEvent({
-        uri: "first-visits",
-        data: {
-          event: "first-visit",
-          timestamp: Date.now(),
-          apiKey: this.apiKey,
-          visitorId: localStorage.getItem("visitorId"),
-        },
-      });
-    }
+    addEventListener(
+      document,
+      "visibilitychange",
+      handleBeforeVisibilityChangeWrapper
+    );
+
+    // Gestion de l'événement beforeunload pour les navigateurs qui le supportent
+    const handleBeforeUnload = (sessionEnded) => {
+      openTabsCount--;
+      if (openTabsCount === 0 && !sessionEnded) {
+        sessionEnded = true; // Prevents multiple session end events
+        const sessionStartTime = getCookie(sessionCookieName);
+        const endTime = Date.now();
+        const sessionId = uuidv4();
+
+        this.trackEvent({
+          uri: "sessions",
+          data: {
+            event: "session",
+            sessionId,
+            startTime: sessionStartTime,
+            endTime,
+            duration: endTime - sessionStartTime,
+            apiKey: this.apiKey,
+            visitorId,
+          },
+        });
+
+        deleteCookie(sessionCookieName);
+      }
+    };
+
+    // Encapsule handleBeforeUnload dans une fonction pour pouvoir utiliser sessionEnded
+    const handleBeforeUnloadWrapper = () => {
+      handleBeforeUnload(sessionEnded);
+    };
+
+    addEventListener(window, "beforeunload", handleBeforeUnloadWrapper);
+
+    // Gestion de l'événement unload pour les navigateurs qui ne supportent pas beforeunload
+    const handleUnload = (sessionEnded) => {
+      openTabsCount--;
+      if (openTabsCount === 0 && !sessionEnded) {
+        sessionEnded = true; // Prevents multiple session end events
+        const sessionStartTime = getCookie(sessionCookieName);
+        const endTime = Date.now();
+        const sessionId = uuidv4();
+
+        this.trackEvent({
+          uri: "sessions",
+          data: {
+            event: "session",
+            sessionId,
+            startTime: sessionStartTime,
+            endTime,
+            duration: endTime - sessionStartTime,
+            apiKey: this.apiKey,
+            visitorId,
+          },
+        });
+
+        deleteCookie(sessionCookieName);
+      }
+    };
+
+    const handleUnloadWrapper = () => {
+      handleUnload(sessionEnded);
+    };
+    addEventListener(window, "unload", handleUnloadWrapper);
+
+    // Fonction de nettoyage
+    const cleanup = () => {
+      removeEventListener(
+        document,
+        "visibilitychange",
+        handleBeforeVisibilityChangeWrapper
+      );
+      removeEventListener(window, "beforeunload", handleBeforeUnloadWrapper);
+      removeEventListener(window, "unload", handleUnloadWrapper);
+    };
+
+    // Retourner la fonction de nettoyage
+    return cleanup;
   };
 
   init = () => {
