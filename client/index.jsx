@@ -13,9 +13,12 @@ const OtherComponent = () => {
       <button ref={elementRef}>
         My Element
       </button>
-      <button ref={elementRef2}>
-        My Element 2
-      </button>
+      <a href="/">
+        <button ref={elementRef2}>
+          My Element 2
+        </button>
+
+      </a>
     </>
   );
 };
