@@ -103,19 +103,6 @@ class TrackManager {
     };
   };
 
-  // trackHeatmap = ({ tag, positions, page }) => {
-  //   const eventData = {
-  //     tag,
-  //     type: "heatmap",
-  //     positions,
-  //     page,
-  //     apiKey: this.apiKey,
-  //     uri: "heatmap",
-  //   };
-  //   console.log(eventData);
-  //   // sendEvent(eventData);
-  // };
-
   trackHeatmap = () => {
     const handleMouseMove = throttle((event) => {
       // Récupérer les coordonnées de la souris
