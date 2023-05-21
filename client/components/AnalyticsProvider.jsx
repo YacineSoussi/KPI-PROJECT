@@ -8,6 +8,7 @@ const AnalyticsProvider = ({ children, apiKey }) => {
   const trackManager = useMemo(() => new TrackManager(apiKey), [apiKey]);
 
   useEffect(() => {
+
     const cleanup = trackManager.init();
     return cleanup;
   }, [trackManager]);

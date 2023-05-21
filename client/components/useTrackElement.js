@@ -3,7 +3,6 @@ import { AnalyticsContext } from "./AnalyticsProvider";
 
 const useTrackElement = (eventTag, eventType) => {
   const trackManager = useContext(AnalyticsContext);
-  console.log(trackManager);
 
   const ref = useRef(null);
 

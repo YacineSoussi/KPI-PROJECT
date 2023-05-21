@@ -6,16 +6,17 @@ import useTrackMousemove from "./components/useTrackMousemove";
 
 const OtherComponent = () => {
 
-  const elementRef = useTrackElement("button1", "mouseover");
+  // const elementRef = useTrackElement("button1", "mouseover");
   const elementRef2 = useTrackElement("button2", "click");
 
-  useTrackMousemove();
+
+  // useTrackMousemove();
 
   return (
     <>
-      <button ref={elementRef}>
+      {/* <button ref={elementRef}>
         My Element
-      </button>
+      </button> */}
       <button ref={elementRef2}>
         My Element 2
       </button>

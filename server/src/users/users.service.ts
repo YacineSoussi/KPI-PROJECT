@@ -32,9 +32,7 @@ export class UsersService {
     public async register(user: CreateUserDto): Promise<User> {
 
         const newUser = {
-            email: user.email,
-            password: user.password,
-            url: user.url,
+            ...user,
             apiKey: this.generateKey(),
             secretKey: this.generateKey(),
         };

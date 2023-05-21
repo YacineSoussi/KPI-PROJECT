@@ -21,8 +21,7 @@ export class VisitorController {
 
   @HttpCode(201)
   @Post()
-  @UsePipes(new ValidationPipe({ transform: true }))
-  async create(@Body() createVisitorDto: CreateVisitorDto): Promise<Visitor> {
+  async create(@Body(new ValidationPipe({transform: true})) createVisitorDto: CreateVisitorDto): Promise<Visitor> {
     return this.visitorService.createVisitor(createVisitorDto);
   }
 

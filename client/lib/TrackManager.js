@@ -81,14 +81,14 @@ class TrackManager {
   };
 
   trackElement = ({ tag, event, element }) => {
-    console.log("trackElement", element, event);
-
     const handleEvent = () => {
       const eventData = {
         tag,
         type: event,
         apiKey: this.apiKey,
-        uri: "events",
+        page: window.location.pathname,
+        visitorId: getCookie("visitorId"),
+        sessionId: getCookie("sessionId"),
       };
       this.trackEvent({
         uri: "events",
@@ -125,9 +125,6 @@ class TrackManager {
         visitorId: getCookie("visitorId"),
         sessionId: getCookie("sessionId"),
       });
-
-      console.log("Mouse coordinates:", clientX, clientY);
-      console.log("Page size:", pageSize);
     }, 300);
 
     // Ajouter un écouteur d'événement pour le mouvement de la souris
@@ -229,9 +226,6 @@ class TrackManager {
         handleBeforeVisibilityChangeWrapper
       );
     };
-
-    console.log("sessionCookieName", getCookie(sessionCookieName));
-    console.log("visitorId", visitorId);
 
     // Retourner la fonction de nettoyage
     return cleanup;

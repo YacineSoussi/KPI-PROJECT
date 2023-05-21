@@ -37,8 +37,6 @@ export class AuthenticationGuard implements CanActivate {
       const { id } = this.jwtService.verify(token);
       const user = await this.usersService.findOneById(id);
 
-      console.log(user);
-
       if (!user) {
         throw new BadRequestException("Invalid user");
       }
