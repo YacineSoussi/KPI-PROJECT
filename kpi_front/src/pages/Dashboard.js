@@ -2,12 +2,15 @@ import React, { useState } from "react";
 import Graph from "../components/Graph/Graph";
 import DashboardForm from "../components/DashboardForm";
 import TagForm from "../components/TagForm";
-import { useQuery } from "react-query";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import TagsList from "../components/tags/TagsList";
 
 const Dashboard = () => {
+  const queryClient = useQueryClient();
   const fetchTags = async () => {
     const response = await fetch("http://localhost:3000/tags");
     const data = await response.json();
+    console.log(data);
     return data;
   };
 
@@ -15,7 +18,61 @@ const Dashboard = () => {
     data: tags,
     isLoading: tagsLoading,
     error: tagsError,
+    refetch: refetchTags,
   } = useQuery("tags", fetchTags);
+
+  const deleteTagMutation = useMutation((id) => {
+    return fetch(`http://localhost:3000/tags/${id}`, {
+      method: "DELETE",
+    }).then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to delete tag");
+      }
+    });
+  });
+
+  const onDelete = async (id) => {
+    try {
+      await deleteTagMutation.mutateAsync(id);
+
+      queryClient.setQueryData("tags", (oldTags) => {
+        return oldTags.filter((tag) => tag._id !== id);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const editTagMutation = useMutation(({ id, body }) => {
+    return fetch(`http://localhost:3000/tags/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    }).then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to update tag");
+      }
+      return response.json();
+    });
+  });
+
+  const onEdit = async (id, body) => {
+    try {
+      await editTagMutation.mutateAsync({ id, body });
+      queryClient.setQueryData("tags", (oldTags) => {
+        return oldTags.map((tag) => {
+          if (tag._id === id) {
+            return { ...tag, ...body };
+          }
+          return tag;
+        });
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const userGraphs = [
     {
@@ -80,7 +137,8 @@ const Dashboard = () => {
               <DashboardForm tags={tags} />
             </div>
             <div className="w-50">
-              <TagForm tags={tags} />
+              {/* <TagForm tags={tags} /> */}
+              <TagsList onEdit={onEdit} onDelete={onDelete} tags={tags} />
             </div>
             <Graph userGraphs={userGraphs} />
           </>
