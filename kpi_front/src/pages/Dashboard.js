@@ -72,7 +72,7 @@ const Dashboard = () => {
       <div className="d-flex flex-wrap">
         {tagsLoading ? (
           <div className="d-flex justify-content-center align-items-center w-100">
-            <img src="../assets/loading.gif" alt="Loading" />
+            <img src="loading.gif" alt="Loading" />
           </div>
         ) : (
           <>
