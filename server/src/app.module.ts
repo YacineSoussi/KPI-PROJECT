@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { User } from './entities/users.entity';
 import { UsersModule } from './users/users.module';
 import { AuthenticationModule } from './authentication/authentication.module';
+import { TagsModule } from './tags/tags.module';
 
 @Module({
   imports: [ConfigModule.forRoot() ,DatabaseModule, VisitorModule, EventsModule, UsersModule, TypeOrmModule.forRoot(
@@ -21,7 +22,7 @@ import { AuthenticationModule } from './authentication/authentication.module';
       synchronize: true,
       autoLoadEntities: true
     }
-  ), AuthenticationModule],
+  ), AuthenticationModule, TagsModule],
   controllers: [],
   providers: [],
 })

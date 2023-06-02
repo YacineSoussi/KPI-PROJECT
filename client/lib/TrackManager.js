@@ -143,15 +143,14 @@ class TrackManager {
     const page = window.location.pathname;
     const eventData = {
       tag: "pageView",
-      type: "pageView",
-      page,
+      type: page,
       apiKey: this.apiKey,
       visitorId: localStorage.getItem("visitorId"),
       sessionId: localStorage.getItem("sessionId"),
     };
 
     this.trackEvent({
-      uri: "pageViews",
+      uri: "events",
       ...eventData,
     });
   };

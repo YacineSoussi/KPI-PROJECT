@@ -51,6 +51,20 @@ services:
       - REACT_API_URL=http://localhost:3000
       - CLIENT_PORT=3001
       - CLIENT_HOST=0.0.0.0
+
+  kpi_front:
+    image: node:19.0.0-alpine
+    working_dir: /home/node
+    stdin_open: true
+    ports:
+      - 8001:8001
+    volumes:
+      - ./kpi_front:/home/node
+    command: sh -c "npm install && npm run start"
+    environment:
+      - REACT_API_URL=http://localhost:3000
+      - CLIENT_PORT=3001
+      - CLIENT_HOST=
       
 volumes:
   db: {}

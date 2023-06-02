@@ -11,3 +11,5 @@ client/node_modules
 server/node_modules
 node_modules
 postgres
+
+kpi_front/node_modules

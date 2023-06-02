@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { Event, EventDocument } from './schema/event.model';
+import { Event, EventDocument } from '../schema/event.model';
 import { CreateEventDto, UpdateEventDto } from './dto/event.dto';
 
 @Injectable()

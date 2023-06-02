@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Param, HttpCode, ValidationPipe, UseInterceptors } from '@nestjs/common';
 import { CreateEventDto, UpdateEventDto } from './dto/event.dto';
 import { EventsService } from './events.service';
-import { HeadersInterceptor } from 'src/user-agent/user-agent.interceptor';
+import { HeadersInterceptor } from 'src/interceptors/user-agent.interceptor';
 
 @Controller('events')
 export class EventsController {
