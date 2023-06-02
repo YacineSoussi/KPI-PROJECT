@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Graph from "../components/Graph/Graph";
+import Graph from "../components/graphs/Graph";
 import DashboardForm from "../components/DashboardForm";
 import TagForm from "../components/TagForm";
 import useTagManagement from "../hooks/useTagManagement";
