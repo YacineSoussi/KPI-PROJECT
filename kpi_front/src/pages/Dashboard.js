@@ -7,10 +7,11 @@ import TagsList from "../components/tags/TagsList";
 
 const Dashboard = () => {
   const queryClient = useQueryClient();
+
   const fetchTags = async () => {
     const response = await fetch("http://localhost:3000/tags");
     const data = await response.json();
-    console.log(data);
+
     return data;
   };
 
@@ -21,25 +22,27 @@ const Dashboard = () => {
     refetch: refetchTags,
   } = useQuery("tags", fetchTags);
 
-  const deleteTagMutation = useMutation((id) => {
-    return fetch(`http://localhost:3000/tags/${id}`, {
-      method: "DELETE",
+  const createTagMutation = useMutation((body) => {
+    return fetch("http://localhost:3000/tags", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ...body, apiKey: "23456789" }),
     }).then((response) => {
       if (!response.ok) {
-        throw new Error("Failed to delete tag");
+        throw new Error("Failed to create tag");
       }
+      return response.json();
     });
   });
 
-  const onDelete = async (id) => {
+  const onAdd = async (body) => {
     try {
-      await deleteTagMutation.mutateAsync(id);
-
-      queryClient.setQueryData("tags", (oldTags) => {
-        return oldTags.filter((tag) => tag._id !== id);
-      });
+      await createTagMutation.mutateAsync(body);
+      queryClient.invalidateQueries("tags");
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
 
@@ -58,17 +61,30 @@ const Dashboard = () => {
     });
   });
 
+  const deleteTagMutation = useMutation((id) => {
+    return fetch(`http://localhost:3000/tags/${id}`, {
+      method: "DELETE",
+    }).then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to delete tag");
+      }
+    });
+  });
+
   const onEdit = async (id, body) => {
     try {
       await editTagMutation.mutateAsync({ id, body });
-      queryClient.setQueryData("tags", (oldTags) => {
-        return oldTags.map((tag) => {
-          if (tag._id === id) {
-            return { ...tag, ...body };
-          }
-          return tag;
-        });
-      });
+      queryClient.invalidateQueries("tags");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const onDelete = async (id) => {
+    try {
+      await deleteTagMutation.mutateAsync(id);
+
+      queryClient.invalidateQueries("tags");
     } catch (error) {
       console.error(error);
     }
@@ -138,7 +154,12 @@ const Dashboard = () => {
             </div>
             <div className="w-50">
               {/* <TagForm tags={tags} /> */}
-              <TagsList onEdit={onEdit} onDelete={onDelete} tags={tags} />
+              <TagsList
+                onAdd={onAdd}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                tags={tags}
+              />
             </div>
             <Graph userGraphs={userGraphs} />
           </>

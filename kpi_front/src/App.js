@@ -6,7 +6,17 @@ import { QueryClient, QueryClientProvider } from "react-query";
 function App() {
   return (
     <>
-      <QueryClientProvider client={new QueryClient()}>
+      <QueryClientProvider
+        client={
+          new QueryClient({
+            defaultOptions: {
+              queries: {
+                refetchOnWindowFocus: false,
+              },
+            },
+          })
+        }
+      >
         <Header />
         <Dashboard />
       </QueryClientProvider>

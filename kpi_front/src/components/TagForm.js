@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useQuery } from "react-query";
 
-const TagForm = ({ tags }) => {
+const TagForm = ({ onAdd, setIsAdding }) => {
   const [tagName, setTagName] = useState("");
   const [description, setDescription] = useState("");
 
@@ -15,12 +15,10 @@ const TagForm = ({ tags }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Ici, vous pouvez effectuer des actions supplémentaires avec les données du formulaire
-    console.log("Nom du tag :", tagName);
-    console.log("Description :", description);
-
+    onAdd({ name: tagName, description });
     setTagName("");
     setDescription("");
+    setIsAdding(false);
   };
 
   return (
