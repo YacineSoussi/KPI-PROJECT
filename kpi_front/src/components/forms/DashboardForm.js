@@ -116,7 +116,7 @@ function DashboardForm({ tags }) {
           </select>
         </div>
 
-        <button type="submit" className="btn btn-primary m-2">
+        <button type="submit" className="btn btn-primary mt-2">
           Générer le graphique
         </button>
       </form>

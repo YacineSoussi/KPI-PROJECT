@@ -13,7 +13,7 @@ const TagsList = ({ tags, onDelete, onEdit, onAdd }) => {
           className="btn btn-primary"
           onClick={() => setIsAdding(!isAdding)}
         >
-          {isAdding ? "Annuler" : "Ajouter"}
+          {isAdding ? "Annuler" : "Ajouter un tag"}
         </button>
       </div>
       {isAdding ? (
