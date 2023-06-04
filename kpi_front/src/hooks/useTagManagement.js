@@ -37,7 +37,7 @@ const useTagManagement = () => {
       await createTagMutation.mutateAsync(body);
       queryClient.invalidateQueries("tags");
     } catch (error) {
-      console.log(error);
+      throw new Error(error.message);
     }
   };
 

@@ -2,27 +2,24 @@ import "./App.css";
 import Dashboard from "./pages/Dashboard";
 import Header from "./components/common/Header";
 import { QueryClient, QueryClientProvider } from "react-query";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-
+import { router } from "./router/router";
+import { RouterProvider } from "react-router";
 function App() {
   return (
     <>
-      <Router>
-        <QueryClientProvider
-          client={
-            new QueryClient({
-              defaultOptions: {
-                queries: {
-                  refetchOnWindowFocus: false,
-                },
+      <QueryClientProvider
+        client={
+          new QueryClient({
+            defaultOptions: {
+              queries: {
+                refetchOnWindowFocus: false,
               },
-            })
-          }
-        >
-          <Header />
-          <Dashboard />
-        </QueryClientProvider>
-      </Router>
+            },
+          })
+        }
+      >
+        <RouterProvider router={router}></RouterProvider>
+      </QueryClientProvider>
     </>
   );
 }

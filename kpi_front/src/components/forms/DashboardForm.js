@@ -30,7 +30,6 @@ function DashboardForm({ tags }) {
       dimension: selectedDimension,
       timePeriod: selectedTimePeriod,
     };
-    console.log(data);
     // await fetchGraphData(data);
   };
 

@@ -13,12 +13,17 @@ const TagForm = ({ onAdd, setIsAdding }) => {
     setDescription(event.target.value);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    onAdd({ name: tagName, description });
-    setTagName("");
-    setDescription("");
-    setIsAdding(false);
+    try {
+      await onAdd({ name: tagName, description });
+      setTagName("");
+      setDescription("");
+    } catch (error) {
+      alert("Une erreur est survenue lors de la création du tag");
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   return (

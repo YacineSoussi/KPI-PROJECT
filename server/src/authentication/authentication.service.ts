@@ -56,7 +56,7 @@ public constructor(
       const existingUser = await this.usersService.findOneByEmail(user.email);
 
       if (existingUser) {
-        throw new BadRequestException("User already exists");
+        throw new BadRequestException("Un compte existe déjà avec cette adresse email");
       }
       const hashedPassword = await hash(user.password, 10);
 
@@ -67,6 +67,21 @@ public constructor(
       };
 
       return await this.usersService.register(newUser);
+    }
+
+    public async getUserFromToken(token: string) {
+      try {
+        const { id } = this.jwtService.verify(token);
+        const user = await this.usersService.findOneById(id);
+    
+        if (!user) {
+          throw new BadRequestException("Invalid user");
+        }
+    
+        return user;
+      } catch (error) {
+        throw error;
+      }
     }
     
 }

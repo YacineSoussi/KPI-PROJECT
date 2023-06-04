@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import Graph from "../components/graphs/Graph";
-import DashboardForm from "../components/DashboardForm";
-import TagForm from "../components/TagForm";
+import DashboardForm from "../components/forms/DashboardForm";
+import TagForm from "../components/forms/TagForm";
 import useTagManagement from "../hooks/useTagManagement";
 import TagsList from "../components/tags/TagsList";
+import Header from "../components/common/Header";
 
 const Dashboard = () => {
   const { tags, tagsLoading, tagsError, refetchTags, onAdd, onEdit, onDelete } =
@@ -61,6 +62,7 @@ const Dashboard = () => {
 
   return (
     <>
+      <Header />
       <div className="d-flex flex-wrap">
         {tagsLoading ? (
           <div className="d-flex justify-content-center align-items-center w-100">

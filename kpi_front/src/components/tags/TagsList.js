@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Tag from "./Tag";
-import TagForm from "../TagForm";
+import TagForm from "../forms/TagForm";
 
 const TagsList = ({ tags, onDelete, onEdit, onAdd }) => {
   const [isAdding, setIsAdding] = useState(false);

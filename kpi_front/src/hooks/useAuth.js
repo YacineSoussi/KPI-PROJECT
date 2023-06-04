@@ -11,11 +11,26 @@ const useAuth = () => {
       },
       body: JSON.stringify(body),
     });
+    if (!response.ok) {
+      throw new Error(
+        "Échec de la connexion. Veuillez vérifier vos informations."
+      );
+    }
     const data = await response.json();
 
     return data;
   };
-
+  const onLogin = async (body) => {
+    try {
+      const data = await loginRequest(body);
+      localStorage.setItem("token", data.token);
+      queryClient.invalidateQueries("user");
+    } catch (error) {
+      throw new Error(
+        "Échec de la connexion. Veuillez vérifier vos informations."
+      );
+    }
+  };
   const logout = () => {
     localStorage.removeItem("token");
     queryClient.removeQueries("user");
@@ -29,32 +44,26 @@ const useAuth = () => {
       },
       body: JSON.stringify(body),
     });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message);
+    }
     const data = await response.json();
 
     return data;
-  };
-
-  const onLogin = async (body) => {
-    try {
-      const data = await loginRequest(body);
-      localStorage.setItem("token", data.token);
-      queryClient.invalidateQueries("user");
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   const onRegister = async (body) => {
     try {
       await registerRequest(body);
     } catch (error) {
-      console.log(error);
+      throw new Error(error.message);
     }
   };
 
   const fetchUser = async () => {
     try {
-      const response = await fetch("http://localhost:3000/auth/user", {
+      const response = await fetch("http://localhost:3000/auth/me", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

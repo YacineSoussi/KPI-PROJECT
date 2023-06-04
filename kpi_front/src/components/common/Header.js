@@ -11,17 +11,6 @@ const Header = () => {
           <Link className="navbar-brand" to="/">
             KPI
           </Link>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarContent"
-            aria-controls="navbarContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            Connexion
-          </button>
 
           {user ? (
             <div className="collapse navbar-collapse" id="navbarContent">
@@ -55,12 +44,13 @@ const Header = () => {
             </div>
           ) : (
             <div className="d-flex">
-              <button
+              <Link
+                to="/login"
                 className="btn btn-outline-light"
                 onClick={() => logout()}
               >
-                Connexion
-              </button>
+                Connexion / inscription
+              </Link>
             </div>
           )}
         </div>
