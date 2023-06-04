@@ -67,6 +67,9 @@ const useAuth = () => {
   };
 
   const fetchUser = async () => {
+    if (!localStorage.getItem("token")) {
+      return null;
+    }
     try {
       const response = await fetch("http://localhost:3000/auth/me", {
         headers: {

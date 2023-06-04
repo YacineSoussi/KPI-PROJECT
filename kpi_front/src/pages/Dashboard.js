@@ -5,7 +5,7 @@ import TagForm from "../components/forms/TagForm";
 import useTagManagement from "../hooks/useTagManagement";
 import TagsList from "../components/tags/TagsList";
 import Header from "../components/common/Header";
-
+import ApiKey from "../components/ApiKey";
 const Dashboard = () => {
   const { tags, tagsLoading, tagsError, refetchTags, onAdd, onEdit, onDelete } =
     useTagManagement();
@@ -63,6 +63,7 @@ const Dashboard = () => {
   return (
     <>
       <Header />
+      <ApiKey />
       <div className="d-flex flex-wrap">
         {tagsLoading ? (
           <div className="d-flex justify-content-center align-items-center w-100">
