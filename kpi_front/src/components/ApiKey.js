@@ -19,7 +19,7 @@ const ApiKey = () => {
     <div className={`copy-api-key ${apiKeyCopied ? "copied" : ""}`}>
       <div className="copy-api-key-content">
         <div className="copy-api-key-text">
-          {apiKeyCopied ? "API Key Copied!" : user && `API Key: ${user.apiKey}`}
+          {apiKeyCopied ? "API Key copié !" : user && `API Key: ${user.apiKey}`}
         </div>
         <div className="copy-api-key-icon" onClick={handleCopyApiKey}>
           <FontAwesomeIcon icon={faCopy} />
