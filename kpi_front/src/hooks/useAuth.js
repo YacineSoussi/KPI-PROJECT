@@ -38,7 +38,7 @@ const useAuth = () => {
   };
   const logout = () => {
     localStorage.removeItem("token");
-    queryClient.removeQueries("user");
+    queryClient.invalidateQueries("user");
   };
 
   const registerRequest = async (body) => {
