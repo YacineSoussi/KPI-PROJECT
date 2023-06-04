@@ -1,4 +1,5 @@
 import { useQueryClient, useMutation, useQuery } from "react-query";
+import jwtDecode from "jwt-decode";
 
 const useAuth = () => {
   const queryClient = useQueryClient();
@@ -11,14 +12,17 @@ const useAuth = () => {
       },
       body: JSON.stringify(body),
     });
+
     if (!response.ok) {
       throw new Error(
         "Échec de la connexion. Veuillez vérifier vos informations."
       );
     }
-    const data = await response.json();
+    const token = await response.text();
+    const decodedToken = jwtDecode(token);
+    const data = decodedToken; // Use the specific data needed from the decoded token
 
-    return data;
+    return { ...data, token };
   };
   const onLogin = async (body) => {
     try {
@@ -26,6 +30,7 @@ const useAuth = () => {
       localStorage.setItem("token", data.token);
       queryClient.invalidateQueries("user");
     } catch (error) {
+      console.log(error, "error");
       throw new Error(
         "Échec de la connexion. Veuillez vérifier vos informations."
       );

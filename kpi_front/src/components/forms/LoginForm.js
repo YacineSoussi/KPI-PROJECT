@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import useAuth from "../../hooks/useAuth";
-
+import { useNavigate } from "react-router-dom";
 const LoginForm = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -8,13 +8,16 @@ const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { onLogin } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+
     try {
       await onLogin({ email: username, password });
+      navigate("/");
     } catch (error) {
       setError("Échec de la connexion. Veuillez vérifier vos informations.");
     } finally {

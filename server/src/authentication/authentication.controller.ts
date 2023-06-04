@@ -22,7 +22,7 @@ export class AuthenticationController {
     @AuthenticationRequired()
     @Get('me')
     public me(@Req() request: any) {
-        return this.AuthenticationService.getUserFromToken(request.headers.authorization);
+        return this.AuthenticationService.getUserFromToken(request.headers.authorization.slice(7));
     }
 
 
