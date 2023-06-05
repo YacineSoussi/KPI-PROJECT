@@ -1,6 +1,8 @@
 import { Event } from './event.model';
+import { Graph } from './graph.model';
 import { Session } from './session.model';
 import { Model } from 'mongoose';
+
 
 export class AggregateService {
   constructor(
@@ -10,57 +12,120 @@ export class AggregateService {
 
   async generateDynamicAggregate(
     metric: string,
-    dimension?: string,
+    dimension: string,
+    timePeriod: string,
+    type: string,
     tag?: string,
-    timePeriod?: string,
-  ) {
+  ): Promise<any[]> {
+    let chartData = {
+      type: type,
+      data: {
+        labels: [],
+        datasets: [],
+      },
+    };
+  
     let aggregate = [];
-
+  
     switch (metric) {
       case 'bounceRate':
         aggregate = await this.calculateBounceRateAggregate(timePeriod);
+        chartData.data.labels = ['Taux de rebond'];
+        chartData.data.datasets.push({
+          label: 'Taux de rebond',
+          data: [aggregate.length],
+          backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        });
         break;
-
+  
       case 'averageSessionDuration':
         aggregate = await this.calculateAverageSessionDurationAggregate(timePeriod);
+        chartData.data.labels = ['Durée moyenne de session'];
+        chartData.data.datasets.push({
+          label: 'Durée moyenne de session',
+          data: [aggregate[0]?.averageSessionDuration || 0],
+          backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        });
         break;
-
+  
       case 'pageViews':
         aggregate = await this.calculatePageViewsAggregate(timePeriod);
+        chartData.data.labels = ['Nombre de pages vues'];
+        chartData.data.datasets.push({
+          label: 'Nombre de pages vues',
+          data: [aggregate[0]?.totalPageViews || 0],
+          backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        });
         break;
-
+  
       case 'clickRate':
         if (tag) {
           aggregate = await this.calculateClickRateByTagAggregate(tag, timePeriod);
+          chartData.data.labels = ['Taux de clics par tag'];
+          chartData.data.datasets.push({
+            label: 'Taux de clics par tag',
+            data: [aggregate[0]?.totalSessions || 0],
+            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+          });
         } else {
           aggregate = await this.calculateGlobalClickRateAggregate(timePeriod);
+          chartData.data.labels = ['Taux de clics global'];
+          chartData.data.datasets.push({
+            label: 'Taux de clics global',
+            data: [aggregate[0]?.totalSessions || 0],
+            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+          });
         }
         break;
-
+  
       case 'session':
         aggregate = await this.calculateSessionAggregate(timePeriod);
+        chartData.data.labels = aggregate.map((item: any) => item._id);
+        chartData.data.datasets.push({
+          label: 'Nombre de sessions',
+          data: aggregate.map((item: any) => item.count),
+          backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        });
         break;
-
+  
       // Ajoutez des cas pour d'autres options de métriques
-
+  
       default:
         // Cas par défaut si aucune métrique n'est sélectionnée
         break;
     }
-
+  
     // Appliquer les étapes d'agrégation supplémentaires en fonction de la dimension sélectionnée
     if (dimension) {
       switch (dimension) {
         case 'source':
           aggregate = this.applySourceDimensionAggregation(aggregate);
+          chartData.data.labels = aggregate.map((item: any) => item._id);
+          chartData.data.datasets.push({
+            label: 'Nombre de sessions',
+            data: aggregate.map((item: any) => item.count),
+            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+          });
           break;
   
         case 'browser':
           aggregate = this.applyBrowserDimensionAggregation(aggregate);
+          chartData.data.labels = aggregate.map((item: any) => item._id);
+          chartData.data.datasets.push({
+            label: 'Nombre de sessions',
+            data: aggregate.map((item: any) => item.count),
+            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+          });
           break;
   
         case 'device':
           aggregate = this.applyDeviceDimensionAggregation(aggregate);
+          chartData.data.labels = aggregate.map((item: any) => item._id);
+          chartData.data.datasets.push({
+            label: 'Nombre de sessions',
+            data: aggregate.map((item: any) => item.count),
+            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+          });
           break;
   
         // Ajoutez des cas pour d'autres options de dimensions
@@ -70,9 +135,10 @@ export class AggregateService {
           break;
       }
     }
-
-    return aggregate;
+  
+    return [chartData];
   }
+  
   //  Taux de rebond 
   private async calculateBounceRateAggregate(timePeriod?: string) {
     const aggregate = await this.eventModel.aggregate([

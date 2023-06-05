@@ -8,6 +8,7 @@ import { User } from './entities/users.entity';
 import { UsersModule } from './users/users.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { TagsModule } from './tags/tags.module';
+import { GraphsModule } from './graphs/graphs.module';
 
 @Module({
   imports: [ConfigModule.forRoot() ,DatabaseModule, VisitorModule, EventsModule, UsersModule, TypeOrmModule.forRoot(
@@ -22,7 +23,7 @@ import { TagsModule } from './tags/tags.module';
       synchronize: true,
       autoLoadEntities: true
     }
-  ), AuthenticationModule, TagsModule],
+  ), AuthenticationModule, TagsModule, GraphsModule],
   controllers: [],
   providers: [],
 })
