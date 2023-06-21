@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { TagsModule } from './tags/tags.module';
 import { GraphsModule } from './graphs/graphs.module';
+import { AggregateModule } from './aggregate/aggregate.module';
 
 @Module({
   imports: [ConfigModule.forRoot() ,DatabaseModule, VisitorModule, EventsModule, UsersModule, TypeOrmModule.forRoot(
@@ -23,7 +24,7 @@ import { GraphsModule } from './graphs/graphs.module';
       synchronize: true,
       autoLoadEntities: true
     }
-  ), AuthenticationModule, TagsModule, GraphsModule],
+  ), AuthenticationModule, TagsModule, GraphsModule, AggregateModule],
   controllers: [],
   providers: [],
 })

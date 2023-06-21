@@ -17,8 +17,9 @@ export class CreateGraphDto {
     @IsString()
     public timePeriod: string;
 
-    @IsString()
     public tag?: string;
+
+    public apiKey?: string[];
 }
 
 export class UpdateGraphDto implements Partial<CreateGraphDto> {}

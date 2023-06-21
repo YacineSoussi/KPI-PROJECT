@@ -1,36 +1,25 @@
 import React, { useState } from "react";
 import { useQuery } from "react-query";
 
-function DashboardForm({ tags }) {
+function DashboardForm({ tags, onAdd }) {
   const [selectedMetric, setSelectedMetric] = useState("bounceRate");
-  const [selectedTag, setSelectedTag] = useState(null);
+  const [selectedTag, setSelectedTag] = useState(tags[0].name);
   const [selectedChartType, setSelectedChartType] = useState("line");
   const [selectedDimension, setSelectedDimension] = useState("source");
   const [selectedTimePeriod, setSelectedTimePeriod] = useState("day");
 
-  const fetchPostGraphData = async (data) => {
-    const response = await fetch("http://localhost:3000/graphs", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
-
     const tag = selectedTag;
 
     const data = {
       metric: selectedMetric,
       tag,
-      chartType: selectedChartType,
+      type: selectedChartType,
       dimension: selectedDimension,
       timePeriod: selectedTimePeriod,
     };
-    // await fetchGraphData(data);
+    await onAdd(data);
   };
 
   return (
@@ -61,12 +50,12 @@ function DashboardForm({ tags }) {
           <div className="form-group">
             <label>Tag :</label>
             <select
-              onInput={(event) => setSelectedTag(event.target.value)}
+              onChange={(event) => setSelectedTag(event.target.value)}
               className="form-control"
               name="tag"
             >
               {tags.map((tag) => (
-                <option key={tag._id} value={tag.id}>
+                <option key={tag._id} value={tag.name}>
                   {tag.name}
                 </option>
               ))}

@@ -1,5 +1,5 @@
 import { Connection } from 'mongoose';
-import { TagSchema } from '../schema/tag.model'
+import { TagSchema } from '../aggregate/schema/tag.model'
 
 export const tagProviders = [
   {

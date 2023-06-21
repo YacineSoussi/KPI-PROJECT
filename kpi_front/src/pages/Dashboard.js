@@ -6,9 +6,21 @@ import useTagManagement from "../hooks/useTagManagement";
 import TagsList from "../components/tags/TagsList";
 import Header from "../components/common/Header";
 import ApiKey from "../components/ApiKey";
+import useGraphManagement from "../hooks/useGraphManagement";
+
 const Dashboard = () => {
   const { tags, tagsLoading, tagsError, refetchTags, onAdd, onEdit, onDelete } =
     useTagManagement();
+
+  const {
+    graphs,
+    graphsLoading,
+    graphsError,
+    refetchGraphs,
+    onAdd: onAddGraph,
+    editGraphMutation,
+    onDelete: onDeleteGraph,
+  } = useGraphManagement();
 
   const userGraphs = [
     {
@@ -72,7 +84,7 @@ const Dashboard = () => {
         ) : (
           <>
             <div className="w-50">
-              <DashboardForm tags={tags} />
+              <DashboardForm tags={tags} graphs={graphs} onAdd={onAddGraph} />
             </div>
             <div className="w-50">
               {/* <TagForm tags={tags} /> */}

@@ -1,42 +1,66 @@
-import { Controller, Get, Post, Patch, Delete, HttpCode, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  HttpCode,
+  Body,
+} from '@nestjs/common';
 import { GraphsService } from './graphs.service';
 import { CreateGraphDto, UpdateGraphDto } from './graphs.dto';
 import { ValidationPipe } from './graphs.pipe';
 
-
 @Controller('graphs')
 export class GraphsController {
+  constructor(private readonly graphService: GraphsService) {}
 
-    constructor(private readonly graphService: GraphsService) {}
+  @Get()
+  @HttpCode(200)
+  async findAll() {
+    return this.graphService.findAll();
+  }
 
-    @Get()
-    @HttpCode(200) 
-    async findAll() {
-        return this.graphService.findAll();
-    }
+  @Post('aggregate')
+  @HttpCode(200)
+  async generateGraphsAggregate(
+    @Body(new ValidationPipe()) createGraphDto: CreateGraphDto,
+  ) {
+    return this.graphService.generateGraphsAggregate(createGraphDto);
+  }
 
-    @Get(':id')
-    @HttpCode(200)
-    async findOneById(id: string) {
-        return this.graphService.findOneById(id);
-    }
+  @Get(':id')
+  @HttpCode(200)
+  async findOneById(id: string) {
+    return this.graphService.findOneById(id);
+  }
 
-    @Post()
-    @HttpCode(201)
-    async createGraph(@Body(new ValidationPipe())createGraphDto: CreateGraphDto) {
-        return this.graphService.createGraph(createGraphDto);
-    }
+  @Post()
+  @HttpCode(201)
+  async createGraph(
+    @Body(new ValidationPipe()) createGraphDto: CreateGraphDto,
+  ) {
+    return this.graphService.createGraph(createGraphDto);
+  }
 
-    @Patch(':id')
-    @HttpCode(200)
-    async updateOneById(@Body(new ValidationPipe())updateGraphDto: UpdateGraphDto, id: string) {
-        return this.graphService.updateOneById(id, updateGraphDto);
-    }
+  @Patch(':id')
+  @HttpCode(200)
+  async updateOneById(
+    @Body(new ValidationPipe()) updateGraphDto: UpdateGraphDto,
+    id: string,
+  ) {
+    return this.graphService.updateOneById(id, updateGraphDto);
+  }
 
-    @Delete(':id')
-    @HttpCode(200)
-    async deleteOneById(id: string) {
-        return this.graphService.deleteOneById(id);
-    }
+  @Delete(':id')
+  @HttpCode(200)
+  async deleteOneById(id: string) {
+    return this.graphService.deleteOneById(id);
+  }
 
+  @Delete('all')
+  @HttpCode(200)
+  async deleteAll() {
+    return this.graphService.deleteAll();
+  }
 }

@@ -1,5 +1,5 @@
 import { CreateTagDto, UpdateTagDto } from './tags.dto';
-import { TagDocument, Tag } from './../schema/tag.model';
+import { TagDocument, Tag } from '../aggregate/schema/tag.model';
 import { Model } from 'mongoose';
 import { Injectable, Inject } from '@nestjs/common';
 

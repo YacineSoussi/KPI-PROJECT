@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Param, Get, Patch, Delete, HttpCode } from '@nestjs/common';
 import { TagsService } from './tags.service';
 import { CreateTagDto, UpdateTagDto } from './tags.dto';
-import { Tag } from 'src/schema/tag.model';
+import { Tag } from 'src/aggregate/schema/tag.model';
 import { ValidationPipe } from './tags.pipe';
 
 

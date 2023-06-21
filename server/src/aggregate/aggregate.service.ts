@@ -1,13 +1,14 @@
-import { Event } from './event.model';
-import { Graph } from './graph.model';
-import { Session } from './session.model';
+import { Event } from './schema/event.model';
+import { Graph } from './schema/graph.model';
+import { Session } from './schema/session.model';
 import { Model } from 'mongoose';
-
+import { Inject } from '@nestjs/common';
 
 export class AggregateService {
   constructor(
-    private readonly eventModel: Model<Event>,
-    private readonly sessionModel: Model<Session>,
+    @Inject('EVENT_MODEL') private eventModel: Model<Event>,
+    @Inject('GRAPH_MODEL') private graphModel: Model<Graph>,
+    @Inject('SESSION_MODEL') private sessionModel: Model<Session>,
   ) {}
 
   async generateDynamicAggregate(
@@ -24,9 +25,9 @@ export class AggregateService {
         datasets: [],
       },
     };
-  
+    console.log(metric, dimension, timePeriod, type, tag, 'AGGREGATE');
     let aggregate = [];
-  
+
     switch (metric) {
       case 'bounceRate':
         aggregate = await this.calculateBounceRateAggregate(timePeriod);
@@ -37,9 +38,11 @@ export class AggregateService {
           backgroundColor: 'rgba(75, 192, 192, 0.6)',
         });
         break;
-  
+
       case 'averageSessionDuration':
-        aggregate = await this.calculateAverageSessionDurationAggregate(timePeriod);
+        aggregate = await this.calculateAverageSessionDurationAggregate(
+          timePeriod,
+        );
         chartData.data.labels = ['Durée moyenne de session'];
         chartData.data.datasets.push({
           label: 'Durée moyenne de session',
@@ -47,7 +50,7 @@ export class AggregateService {
           backgroundColor: 'rgba(75, 192, 192, 0.6)',
         });
         break;
-  
+
       case 'pageViews':
         aggregate = await this.calculatePageViewsAggregate(timePeriod);
         chartData.data.labels = ['Nombre de pages vues'];
@@ -57,10 +60,14 @@ export class AggregateService {
           backgroundColor: 'rgba(75, 192, 192, 0.6)',
         });
         break;
-  
+
       case 'clickRate':
         if (tag) {
-          aggregate = await this.calculateClickRateByTagAggregate(tag, timePeriod);
+          aggregate = await this.calculateClickRateByTagAggregate(
+            tag,
+            timePeriod,
+          );
+          console.log(aggregate, 'aggregateClick');
           chartData.data.labels = ['Taux de clics par tag'];
           chartData.data.datasets.push({
             label: 'Taux de clics par tag',
@@ -77,7 +84,7 @@ export class AggregateService {
           });
         }
         break;
-  
+
       case 'session':
         aggregate = await this.calculateSessionAggregate(timePeriod);
         chartData.data.labels = aggregate.map((item: any) => item._id);
@@ -87,14 +94,14 @@ export class AggregateService {
           backgroundColor: 'rgba(75, 192, 192, 0.6)',
         });
         break;
-  
+
       // Ajoutez des cas pour d'autres options de métriques
-  
+
       default:
         // Cas par défaut si aucune métrique n'est sélectionnée
         break;
     }
-  
+
     // Appliquer les étapes d'agrégation supplémentaires en fonction de la dimension sélectionnée
     if (dimension) {
       switch (dimension) {
@@ -107,7 +114,7 @@ export class AggregateService {
             backgroundColor: 'rgba(75, 192, 192, 0.6)',
           });
           break;
-  
+
         case 'browser':
           aggregate = this.applyBrowserDimensionAggregation(aggregate);
           chartData.data.labels = aggregate.map((item: any) => item._id);
@@ -117,7 +124,7 @@ export class AggregateService {
             backgroundColor: 'rgba(75, 192, 192, 0.6)',
           });
           break;
-  
+
         case 'device':
           aggregate = this.applyDeviceDimensionAggregation(aggregate);
           chartData.data.labels = aggregate.map((item: any) => item._id);
@@ -127,30 +134,30 @@ export class AggregateService {
             backgroundColor: 'rgba(75, 192, 192, 0.6)',
           });
           break;
-  
+
         // Ajoutez des cas pour d'autres options de dimensions
-  
+
         default:
           // Cas par défaut si aucune dimension n'est sélectionnée
           break;
       }
     }
-  
+
     return [chartData];
   }
-  
-  //  Taux de rebond 
+
+  //  Taux de rebond
   private async calculateBounceRateAggregate(timePeriod?: string) {
     const aggregate = await this.eventModel.aggregate([
       // Étape d'agrégation pour compter les pageViews par session
       {
         $match: {
-          type: "pageView", // Filtrer uniquement les événements de type "pageView"
+          type: 'pageView', // Filtrer uniquement les événements de type "pageView"
         },
       },
       {
         $group: {
-          _id: "$sessionId",
+          _id: '$sessionId',
           pageCount: { $sum: 1 }, // Compter le nombre de pageViews dans chaque session
         },
       },
@@ -164,7 +171,7 @@ export class AggregateService {
       { $match: this.getTimePeriodMatch(timePeriod) },
       // Autres étapes d'agrégation
     ]);
-  
+
     return aggregate;
   }
 
@@ -175,47 +182,51 @@ export class AggregateService {
       {
         $group: {
           _id: null,
-          averageSessionDuration: { $avg: "$duration" },
+          averageSessionDuration: { $avg: '$duration' },
         },
       },
       // Ajoutez d'autres étapes d'agrégation au besoin
       { $match: this.getTimePeriodMatch(timePeriod) },
       // Autres étapes d'agrégation
     ]);
-  
+
     return aggregate;
   }
-  
+
   // Nombre de pages vues
   private async calculatePageViewsAggregate(timePeriod?: string) {
     const aggregate = await this.sessionModel.aggregate([
       {
         $group: {
           _id: null,
-          totalPageViews: { $sum: "$pageViews" },
+          totalPageViews: { $sum: '$pageViews' },
         },
       },
       { $match: this.getTimePeriodMatch(timePeriod) },
     ]);
-  
+
     return aggregate;
   }
-  
+
   // Taux de clics par tag
-  private async calculateClickRateByTagAggregate(tag: string, timePeriod?: string) {
+  private async calculateClickRateByTagAggregate(
+    tag: string,
+    timePeriod?: string,
+  ) {
+    // console.log(await this.eventModel.find({ type: 'click' }), 'clicks');
     const aggregate = await this.eventModel.aggregate([
       // Étape d'agrégation pour compter le nombre total de clics par tag
       {
         $match: {
-          type: "click",
+          type: 'click',
           tag,
-          ...this.getTimePeriodMatch(timePeriod),
+          // ...this.getTimePeriodMatch(timePeriod),
         },
       },
       // Étape d'agrégation pour grouper les clics par session
       {
         $group: {
-          _id: "$sessionId",
+          _id: '$sessionId',
           count: { $sum: 1 },
         },
       },
@@ -228,24 +239,24 @@ export class AggregateService {
       },
       // Autres étapes d'agrégation au besoin
     ]);
-  
+    console.log(aggregate, 'aggregate');
     return aggregate;
   }
-  
+
   // Taux de clics global
   private async calculateGlobalClickRateAggregate(timePeriod?: string) {
     const aggregate = await this.eventModel.aggregate([
       // Étape d'agrégation pour compter le nombre total de clics
       {
         $match: {
-          type: "click",
+          type: 'click',
           ...this.getTimePeriodMatch(timePeriod),
         },
       },
       // Étape d'agrégation pour compter le nombre total de sessions avec clics
       {
         $group: {
-          _id: "$sessionId",
+          _id: '$sessionId',
           count: { $sum: 1 },
         },
       },
@@ -258,20 +269,20 @@ export class AggregateService {
       },
       // Autres étapes d'agrégation au besoin
     ]);
-  
+
     return aggregate;
   }
-  
+
   // Nombre de sessions
   private async calculateSessionAggregate(timePeriod?: string) {
-    let groupBy = { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } };
-  
-    if (timePeriod === "month") {
-      groupBy = { $dateToString: { format: "%Y-%m", date: "$createdAt" } };
-    } else if (timePeriod === "year") {
-      groupBy = { $dateToString: { format: "%Y", date: "$createdAt" } };
+    let groupBy = { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } };
+
+    if (timePeriod === 'month') {
+      groupBy = { $dateToString: { format: '%Y-%m', date: '$createdAt' } };
+    } else if (timePeriod === 'year') {
+      groupBy = { $dateToString: { format: '%Y', date: '$createdAt' } };
     }
-  
+
     const aggregate = await this.sessionModel.aggregate([
       {
         $match: this.getTimePeriodMatch(timePeriod),
@@ -283,7 +294,7 @@ export class AggregateService {
         },
       },
     ]);
-  
+
     return aggregate;
   }
 
@@ -292,62 +303,71 @@ export class AggregateService {
       // Étape d'agrégation pour grouper par source de trafic
       {
         $group: {
-          _id: "$source",
+          _id: '$source',
           count: { $sum: 1 },
         },
       },
     ];
-  
+
     // Ajouter les étapes d'agrégation au pipeline de l'agrégat
     aggregate = aggregate.concat(aggregationStages);
-  
+
     return aggregate;
   }
-  
+
   private applyBrowserDimensionAggregation(aggregate: any[]): any[] {
     const aggregationStages = [
       // Étape d'agrégation pour grouper par navigateur
       {
         $group: {
-          _id: "$browser",
+          _id: '$browser',
           count: { $sum: 1 },
         },
       },
     ];
-  
+
     // Ajouter les étapes d'agrégation au pipeline de l'agrégat
     aggregate = aggregate.concat(aggregationStages);
-  
+
     return aggregate;
   }
-  
+
   private applyDeviceDimensionAggregation(aggregate: any[]): any[] {
     const aggregationStages = [
       // Étape d'agrégation pour grouper par appareil
       {
         $group: {
-          _id: "$device",
+          _id: '$device',
           count: { $sum: 1 },
         },
       },
     ];
-  
+
     // Ajouter les étapes d'agrégation au pipeline de l'agrégat
     aggregate = aggregate.concat(aggregationStages);
-  
+
     return aggregate;
   }
-  
 
   private getTimePeriodMatch(timePeriod?: string) {
     let matchCondition = {};
 
     if (timePeriod === 'day') {
-      matchCondition = { createdAt: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) } };
+      matchCondition = {
+        createdAt: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) },
+      };
     } else if (timePeriod === 'week') {
-      matchCondition = { createdAt: { $gte: new Date(new Date().setDate(new Date().getDate() - 7)) } };
+      matchCondition = {
+        createdAt: {
+          $gte: new Date(new Date().setDate(new Date().getDate() - 7)),
+        },
+      };
     } else if (timePeriod === 'month') {
-      matchCondition = { createdAt: { $gte: new Date(new Date().setMonth(new Date().getMonth() - 1)) } };
+      matchCondition = {
+        createdAt: {
+          $gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+        },
+      };
     }
 
     return matchCondition;

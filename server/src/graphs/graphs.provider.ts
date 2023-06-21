@@ -1,5 +1,5 @@
 import { Connection } from "mongoose";
-import { GraphSchema } from "../schema/graph.model";
+import { GraphSchema } from "../aggregate/schema/graph.model";
 
 export const graphProviders = [
    { 
