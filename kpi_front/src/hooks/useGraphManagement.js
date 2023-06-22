@@ -8,7 +8,7 @@ const useGraphManagement = () => {
   const fetchGraphs = async () => {
     const response = await fetch("http://localhost:3000/graphs");
     const data = await response.json();
-    return data.slice(-4);
+    return data.slice(-7);
   };
 
   const generateGraphs = async (graphs) => {

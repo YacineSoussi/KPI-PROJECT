@@ -7,6 +7,7 @@ const Graph = ({ userGraphs }) => {
       <h2 className="w-100">Graphiques de l'utilisateur</h2>
       {userGraphs &&
         userGraphs.map((graph, index) => {
+          console.log(graph.data[0], "graph");
           let chartComponent;
           switch (graph.data[0].type) {
             case "bar":

@@ -67,30 +67,26 @@ export class AggregateService {
             timePeriod,
           );
 
-          // {
-          //   type: "bar",
-          //   data: {
-          //     labels: ["Jan", "Feb", "Mar"],
-          //     datasets: [
-          //       {
-          //         label: "Ventes",
-          //         data: [120, 150, 180],
-          //         backgroundColor: "rgba(75, 192, 192, 0.6)",
-          //       },
-          //     ],
-          //   },
-          // },
+          if (timePeriod === 'day') {
+            const { labels, data } = this.getLabelsAndDataByHour(aggregate);
 
-          chartData.data.labels =
-            type === 'pie'
-              ? [aggregate.map((item: any) => item.clickRate)]
-              : this.getLabels(timePeriod);
-
-          chartData.data.datasets.push({
-            label: 'Taux de clics',
-            data: aggregate.map((item: any) => item.clickRate),
-            backgroundColor: 'rgba(75, 192, 192, 0.6)',
-          });
+            chartData.data.labels = labels;
+            chartData.data.datasets.push({
+              label: 'Nombre de clics',
+              data,
+              backgroundColor: 'rgba(75, 192, 192, 0.6)',
+            });
+          } else {
+            chartData.data.labels =
+              type === 'pie'
+                ? aggregate.map((item: any) => item.period)
+                : this.getLabels(timePeriod);
+            chartData.data.datasets.push({
+              label: timePeriod === 'day' ? 'Nombre de clics' : 'Taux de clics',
+              data: aggregate.map((item: any) => item.clickRate),
+              backgroundColor: 'rgba(75, 192, 192, 0.6)',
+            });
+          }
         } else {
           aggregate = await this.calculateGlobalClickRateAggregate(timePeriod);
           chartData.data.labels = ['Taux de clics global'];
@@ -111,54 +107,7 @@ export class AggregateService {
           backgroundColor: 'rgba(75, 192, 192, 0.6)',
         });
         break;
-
-      // Ajoutez des cas pour d'autres options de métriques
-
-      default:
-        // Cas par défaut si aucune métrique n'est sélectionnée
-        break;
     }
-
-    // Appliquer les étapes d'agrégation supplémentaires en fonction de la dimension sélectionnée
-    // if (dimension) {
-    //   switch (dimension) {
-    //     case 'source':
-    //       aggregate = this.applySourceDimensionAggregation(aggregate);
-    //       chartData.data.labels = aggregate.map((item: any) => item._id);
-    //       chartData.data.datasets.push({
-    //         label: 'Nombre de sessions',
-    //         data: aggregate.map((item: any) => item.count),
-    //         backgroundColor: 'rgba(75, 192, 192, 0.6)',
-    //       });
-    //       break;
-
-    //     case 'browser':
-    //       aggregate = this.applyBrowserDimensionAggregation(aggregate);
-    //       chartData.data.labels = aggregate.map((item: any) => item._id);
-    //       chartData.data.datasets.push({
-    //         label: 'Nombre de sessions',
-    //         data: aggregate.map((item: any) => item.count),
-    //         backgroundColor: 'rgba(75, 192, 192, 0.6)',
-    //       });
-    //       break;
-
-    //     case 'device':
-    //       aggregate = this.applyDeviceDimensionAggregation(aggregate);
-    //       chartData.data.labels = aggregate.map((item: any) => item._id);
-    //       chartData.data.datasets.push({
-    //         label: 'Nombre de sessions',
-    //         data: aggregate.map((item: any) => item.count),
-    //         backgroundColor: 'rgba(75, 192, 192, 0.6)',
-    //       });
-    //       break;
-
-    //     // Ajoutez des cas pour d'autres options de dimensions
-
-    //     default:
-    //       // Cas par défaut si aucune dimension n'est sélectionnée
-    //       break;
-    //   }
-    // }
 
     return [chartData];
   }
@@ -244,14 +193,14 @@ export class AggregateService {
         },
       },
     ]);
-
+    console.log(aggregate, 'aggregate');
     const result = aggregate.map((item: any, index: number) => ({
-      period: labels[index] || '', // Utilisez le label correspondant à l'index
+      period: item._id,
       clickRate: item.count,
       timePeriod,
     }));
 
-    console.log(result);
+    console.log(result, 'result');
     return result;
   }
 
@@ -310,57 +259,6 @@ export class AggregateService {
     return aggregate;
   }
 
-  private applySourceDimensionAggregation(aggregate: any[]): any[] {
-    const aggregationStages = [
-      // Étape d'agrégation pour grouper par source de trafic
-      {
-        $group: {
-          _id: '$source',
-          count: { $sum: 1 },
-        },
-      },
-    ];
-
-    // Ajouter les étapes d'agrégation au pipeline de l'agrégat
-    aggregate = aggregate.concat(aggregationStages);
-
-    return aggregate;
-  }
-
-  private applyBrowserDimensionAggregation(aggregate: any[]): any[] {
-    const aggregationStages = [
-      // Étape d'agrégation pour grouper par navigateur
-      {
-        $group: {
-          _id: '$browser',
-          count: { $sum: 1 },
-        },
-      },
-    ];
-
-    // Ajouter les étapes d'agrégation au pipeline de l'agrégat
-    aggregate = aggregate.concat(aggregationStages);
-
-    return aggregate;
-  }
-
-  private applyDeviceDimensionAggregation(aggregate: any[]): any[] {
-    const aggregationStages = [
-      // Étape d'agrégation pour grouper par appareil
-      {
-        $group: {
-          _id: '$device',
-          count: { $sum: 1 },
-        },
-      },
-    ];
-
-    // Ajouter les étapes d'agrégation au pipeline de l'agrégat
-    aggregate = aggregate.concat(aggregationStages);
-
-    return aggregate;
-  }
-
   private getTimePeriodMatch(timePeriod?: string) {
     let matchCondition = {};
 
@@ -389,7 +287,7 @@ export class AggregateService {
     let dateFormat: string;
 
     if (timePeriod === 'day') {
-      dateFormat = '%d/%m/%Y';
+      dateFormat = '%d/%m/%Y %H:%M';
     } else if (timePeriod === 'month') {
       dateFormat = '%m/%Y';
     } else if (timePeriod === 'week') {
@@ -447,5 +345,32 @@ export class AggregateService {
     } else {
       throw new Error('Invalid timePeriod');
     }
+  }
+
+  /**
+   * | [
+  { _id: '20/05/2023 22:59', count: 1 },
+{ _id: '22/06/2023 20:42', count: 3 },
+{ _id: '21/05/2023 16:36', count: 1 },
+k{ _id: '21/05/2023 15:16', count: 1 },
+{ _id: '20/05/2023 23:02', count: 2 }
+] aggregate
+   * @param aggregate 
+   * @returns 
+   */
+  private getLabelsAndDataByHour(aggregate: any[]): {
+    labels: string[];
+    data: number[];
+  } {
+    const labels = this.getLabels('day');
+    const data = labels.map((label) => {
+      const item = aggregate.find((item) => {
+        return item.period.split(' ')[1].split(':')[0] === label.split(':')[0];
+      });
+      console.log(item, 'ITEM');
+      return item ? item.clickRate : 0;
+    });
+    console.log(data, 'DATA');
+    return { labels, data };
   }
 }

@@ -21,6 +21,12 @@ export class GraphsController {
     return this.graphService.findAll();
   }
 
+  @Get('data')
+  @HttpCode(200)
+  async getDataGraphs() {
+    return this.graphService.getDataGraphs();
+  }
+
   @Post('aggregate')
   @HttpCode(200)
   async generateGraphsAggregate(

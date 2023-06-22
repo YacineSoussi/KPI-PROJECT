@@ -5,7 +5,6 @@ function DashboardForm({ tags, onAdd }) {
   const [selectedMetric, setSelectedMetric] = useState("bounceRate");
   const [selectedTag, setSelectedTag] = useState(tags[0].name);
   const [selectedChartType, setSelectedChartType] = useState("line");
-  const [selectedDimension, setSelectedDimension] = useState("source");
   const [selectedTimePeriod, setSelectedTimePeriod] = useState("day");
 
   const handleSubmit = async (event) => {
@@ -16,7 +15,6 @@ function DashboardForm({ tags, onAdd }) {
       metric: selectedMetric,
       tag,
       type: selectedChartType,
-      dimension: selectedDimension,
       timePeriod: selectedTimePeriod,
     };
     await onAdd(data);
@@ -74,20 +72,6 @@ function DashboardForm({ tags, onAdd }) {
             <option value="line">Ligne</option>
             <option value="bar">Barres</option>
             <option value="pie">Camembert</option>
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label>Dimension :</label>
-          <select
-            className="form-control"
-            name="dimension"
-            value={selectedDimension}
-            onChange={(event) => setSelectedDimension(event.target.value)}
-          >
-            <option value="source">Source de trafic</option>
-            <option value="browser">Navigateur</option>
-            <option value="device">Appareil</option>
           </select>
         </div>
 
