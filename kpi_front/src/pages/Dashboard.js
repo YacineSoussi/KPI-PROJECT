@@ -9,8 +9,16 @@ import ApiKey from "../components/ApiKey";
 import useGraphManagement from "../hooks/useGraphManagement";
 
 const Dashboard = () => {
-  const { tags, tagsLoading, tagsError, refetchTags, onAdd, onEdit, onDelete } =
-    useTagManagement();
+  const {
+    tags,
+    tagsLoading,
+    tagsError,
+    refetchTags,
+    onAdd,
+    onEdit,
+    onDelete,
+    updatedGraphs,
+  } = useTagManagement();
 
   const {
     graphs,
@@ -22,54 +30,6 @@ const Dashboard = () => {
     onDelete: onDeleteGraph,
   } = useGraphManagement();
 
-  const userGraphs = [
-    {
-      type: "bar",
-      data: {
-        labels: ["Jan", "Feb", "Mar"],
-        datasets: [
-          {
-            label: "Ventes",
-            data: [120, 150, 180],
-            backgroundColor: "rgba(75, 192, 192, 0.6)",
-          },
-        ],
-      },
-    },
-    {
-      type: "line",
-      data: {
-        labels: ["Jan", "Feb", "Mar"],
-        datasets: [
-          {
-            label: "Ventes",
-            data: [120, 150, 140],
-            backgroundColor: "rgba(75, 192, 192, 0.6)",
-          },
-        ],
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-          },
-        },
-      },
-    },
-    {
-      type: "pie",
-      data: {
-        labels: ["Jan", "Feb", "Mar"],
-        datasets: [
-          {
-            label: "Ventes",
-            data: [120, 150, 180],
-            backgroundColor: ["#FF6384", "#00ff00", "#0000ff"],
-          },
-        ],
-      },
-    },
-  ];
   const selectedMetric = "clickRate";
 
   return (
@@ -95,7 +55,7 @@ const Dashboard = () => {
                 tags={tags}
               />
             </div>
-            <Graph userGraphs={userGraphs} />
+            <Graph userGraphs={graphs} graphs={graphs} />
           </>
         )}
       </div>

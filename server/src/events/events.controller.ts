@@ -8,6 +8,7 @@ import {
   ValidationPipe,
   UseInterceptors,
   Patch,
+  Delete,
 } from '@nestjs/common';
 import { CreateEventDto, UpdateEventDto } from './dto/event.dto';
 import { EventsService } from './events.service';
@@ -53,5 +54,11 @@ export class EventsController {
     @Param('id') id: string,
   ): Promise<any> {
     return this.eventsService.updateEvent(id, updateEventDto);
+  }
+
+  @Delete(':id')
+  @HttpCode(200)
+  async deleteOneById(@Param('id') id: string): Promise<any> {
+    return this.eventsService.deleteEvent(id);
   }
 }

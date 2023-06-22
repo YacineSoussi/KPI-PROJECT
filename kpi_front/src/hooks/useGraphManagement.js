@@ -8,31 +8,42 @@ const useGraphManagement = () => {
   const fetchGraphs = async () => {
     const response = await fetch("http://localhost:3000/graphs");
     const data = await response.json();
-    return data;
+    return data.slice(-4);
   };
 
   const generateGraphs = async (graphs) => {
-    console.log(graphs, "graphs");
     if (graphs) {
-      for (const graph of graphs) {
-        const body = {
-          metric: graph.metric,
-          tag: graph.tag,
-          type: graph.type,
-          dimension: graph.dimension,
-          timePeriod: graph.timePeriod,
-          apiKey: user?.apiKey,
-        };
-        const response = await fetch("http://localhost:3000/graphs/aggregate", {
-          method: "POST",
-          body: JSON.stringify(body),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        const result = await response.json();
-        // graph.data = result;
-      }
+      const updatedGraphs = await Promise.all(
+        graphs.map(async (graph) => {
+          const body = {
+            metric: graph.metric,
+            tag: graph.tag,
+            type: graph.type,
+            dimension: graph.dimension,
+            timePeriod: graph.timePeriod,
+            apiKey: user?.apiKey,
+          };
+          const response = await fetch(
+            "http://localhost:3000/graphs/aggregate",
+            {
+              method: "POST",
+              body: JSON.stringify(body),
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          const result = await response.json();
+          const updatedGraph = {
+            ...graph,
+            data: result[0] ? result[0].data : null,
+          };
+          return updatedGraph;
+        })
+      );
+      console.log(updatedGraphs, "updatedGraph");
+
+      return updatedGraphs;
     }
   };
 
@@ -41,9 +52,7 @@ const useGraphManagement = () => {
     isLoading: graphsLoading,
     error: graphsError,
     refetch: refetchGraphs,
-  } = useQuery("graphs", fetchGraphs, {
-    onSuccess: (data) => generateGraphs(data),
-  });
+  } = useQuery("graphs", fetchGraphs);
 
   const createGraphMutation = useMutation((body) => {
     console.log(body, "body");

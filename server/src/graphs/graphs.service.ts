@@ -17,8 +17,16 @@ export class GraphsService {
     return createdGraph.save();
   }
 
-  async findAll(): Promise<Graph[]> {
-    return await this.graphModel.find().exec();
+  async findAll(): Promise<any[]> {
+    const graphs = await this.graphModel.find().exec();
+
+    const updatedGraphs = await Promise.all(
+      graphs.map(async (graph) => {
+        const data = await this.generateGraphsAggregate(graph);
+        return { data };
+      }),
+    );
+    return updatedGraphs;
   }
 
   async generateGraphsAggregate(
@@ -34,6 +42,10 @@ export class GraphsService {
     );
   }
 
+  async getGraphsAggregate(CreateGraphDto: CreateGraphDto): Promise<any[]> {
+    return this.generateGraphsAggregate(CreateGraphDto);
+  }
+
   findOneById(id: string): Promise<Graph> {
     return this.graphModel.findById(id).exec();
   }
@@ -46,12 +58,5 @@ export class GraphsService {
 
   deleteOneById(id: string): Promise<Graph> {
     return this.graphModel.findByIdAndDelete(id).exec();
-  }
-
-  async deleteAll(): Promise<any> {
-    const graphs = await this.graphModel.find().exec();
-    graphs.forEach((graph) => {
-      graph.remove();
-    });
   }
 }

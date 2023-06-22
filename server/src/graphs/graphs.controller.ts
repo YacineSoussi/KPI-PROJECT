@@ -57,10 +57,4 @@ export class GraphsController {
   async deleteOneById(id: string) {
     return this.graphService.deleteOneById(id);
   }
-
-  @Delete('all')
-  @HttpCode(200)
-  async deleteAll() {
-    return this.graphService.deleteAll();
-  }
 }
