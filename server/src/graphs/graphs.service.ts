@@ -23,6 +23,9 @@ export class GraphsService {
     const updatedGraphs = await Promise.all(
       graphs.map(async (graph) => {
         const data = await this.generateGraphsAggregate(graph);
+        console.log(graph);
+        data[0]['id'] = graph._id;
+        data[0]['tag'] = graph?.tag;
         return { data };
       }),
     );
@@ -42,8 +45,8 @@ export class GraphsService {
     );
   }
 
-  async getGraphsAggregate(CreateGraphDto: CreateGraphDto): Promise<any[]> {
-    return this.generateGraphsAggregate(CreateGraphDto);
+  async getDataGraphs() {
+    return await this.graphModel.find().exec();
   }
 
   findOneById(id: string): Promise<Graph> {
