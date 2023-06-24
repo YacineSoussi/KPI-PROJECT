@@ -52,17 +52,27 @@ export class AggregateService {
 
       case 'pageViews':
         aggregate = await this.calculatePageViewsAggregate(timePeriod);
-        console.log(aggregate, 'pageViews');
-        const pageViewsData = aggregate.map((item) => item.pageViews);
-        const pageViewsLabels = aggregate.map((item) => item.period);
 
-        chartData.data.labels = pageViewsLabels;
+        const { labels, data } = this.getLabelsAndDataByTimePeriodByPage(
+          aggregate,
+          timePeriod,
+        );
+
+        chartData.data.labels =
+          type === 'pie'
+            ? aggregate.map((item: any) => item.period)
+            : this.getLabels(timePeriod);
         chartData.data.datasets.push({
           label: 'Nombre de pages vues',
-          data: pageViewsData,
+          data:
+            type === 'pie'
+              ? data.filter((item) => {
+                  return item !== 0 && item !== undefined;
+                })
+              : data,
           backgroundColor:
             type === 'pie'
-              ? this.getColors(pageViewsData)
+              ? this.getColors(data.filter((value: number) => value > 0))
               : this.getRandomColor(),
         });
 
@@ -499,5 +509,23 @@ export class AggregateService {
       color += letters[Math.round(Math.random() * 15)];
     }
     return color;
+  }
+
+  private getLabelsAndDataByTimePeriodByPage(
+    aggregate: any[],
+    timePeriod: string,
+  ): { labels: string[]; data: number[] } {
+    const labels = this.getLabels(timePeriod);
+    const data = labels.map((label) => {
+      const item = aggregate.find((item) => {
+        const month = this.getMonthNumberFromDate(item.period);
+        console.log(item, 'item', 'label', label);
+        console.log(month, 'month');
+
+        return month === label;
+      });
+      return item ? item.pageViews : 0;
+    });
+    return { labels, data };
   }
 }

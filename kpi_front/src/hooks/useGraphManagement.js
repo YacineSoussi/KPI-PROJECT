@@ -40,7 +40,6 @@ const useGraphManagement = () => {
           return updatedGraph;
         })
       );
-      console.log(updatedGraphs, "updatedGraph");
 
       return updatedGraphs;
     }
@@ -54,7 +53,6 @@ const useGraphManagement = () => {
   } = useQuery("graphs", fetchGraphs);
 
   const createGraphMutation = useMutation((body) => {
-    console.log(body, "body");
     return fetch("http://localhost:3000/graphs", {
       method: "POST",
       headers: {
@@ -63,7 +61,6 @@ const useGraphManagement = () => {
       body: JSON.stringify({ ...body, apiKey: "23456789" }),
     }).then((response) => {
       if (!response.ok) {
-        console.log(response.body);
         throw new Error(response.statusText);
       }
       return response.json();

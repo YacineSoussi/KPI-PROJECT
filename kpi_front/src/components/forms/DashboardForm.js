@@ -35,11 +35,11 @@ function DashboardForm({ tags, onAdd }) {
             onChange={(event) => setSelectedMetric(event.target.value)}
           >
             <option value="clickRate">Nombre de clics</option>
+            <option value="pageViews">Nombre de pages vues</option>
             <option value="bounceRate">Taux de rebond</option>
             <option value="averageSessionDuration">
               Durée moyenne de session
             </option>
-            <option value="pageViews">Nombre de pages vues</option>
             <option value="session">Sessions</option>
           </select>
         </div>
@@ -83,9 +83,14 @@ function DashboardForm({ tags, onAdd }) {
             value={selectedTimePeriod}
             onChange={(event) => setSelectedTimePeriod(event.target.value)}
           >
-            <option value="day">Par jour</option>
-            <option value="week">Par semaine</option>
-            <option value="month">Par mois</option>
+            {selectedMetric === "pageViews" ? (
+              <option value="month">Par mois</option>
+            ) : (
+              <>
+                <option value="day">Par jour</option>
+                <option value="week">Par semaine</option>
+              </>
+            )}
           </select>
         </div>
 
