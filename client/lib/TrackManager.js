@@ -243,7 +243,6 @@ class TrackManager {
         handleBeforeVisibilityChangeWrapper
       );
     } else {
-      console.log("desktop");
       addEventListener(document, "beforeunload", handleBeforeUnload);
     }
 

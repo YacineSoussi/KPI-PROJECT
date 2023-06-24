@@ -17,12 +17,11 @@ export class GraphsService {
     return createdGraph.save();
   }
 
-  async findAll(): Promise<any[]> {
-    const graphs = await this.graphModel.find().exec();
-
+  async findAll(apiKey): Promise<any[]> {
+    const graphs = await this.graphModel.find({ apiKey: apiKey }).exec();
     const updatedGraphs = await Promise.all(
       graphs.map(async (graph) => {
-        const data = await this.generateGraphsAggregate(graph);
+        const data = await this.generateGraphsAggregate(graph, apiKey);
         data[0]['id'] = graph._id;
         data[0]['tag'] = graph?.tag;
         return { data };
@@ -33,12 +32,14 @@ export class GraphsService {
 
   async generateGraphsAggregate(
     CreateGraphDto: CreateGraphDto,
+    apiKey: string,
   ): Promise<any[]> {
     const { metric, timePeriod, type, tag } = CreateGraphDto;
     return this.aggregateService.generateDynamicAggregate(
       metric,
       timePeriod,
       type,
+      apiKey,
       tag,
     );
   }

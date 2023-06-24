@@ -4,7 +4,11 @@ const useTagManagement = () => {
   const queryClient = useQueryClient();
 
   const fetchTags = async () => {
-    const response = await fetch("http://localhost:3000/tags");
+    const response = await fetch("http://localhost:3000/tags", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
     const data = await response.json();
 
     return data;
@@ -22,6 +26,7 @@ const useTagManagement = () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({ ...body, apiKey: "23456789" }),
     }).then((response) => {
@@ -46,6 +51,7 @@ const useTagManagement = () => {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({ ...body, apiKey: "23456789" }),
     }).then((response) => {
@@ -59,6 +65,10 @@ const useTagManagement = () => {
   const deleteTagMutation = useMutation((id) => {
     return fetch(`http://localhost:3000/tags/${id}`, {
       method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     }).then((response) => {
       if (!response.ok) {
         throw new Error("Failed to delete tag");

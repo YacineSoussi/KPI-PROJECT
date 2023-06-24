@@ -15,7 +15,7 @@ export class CreateGraphDto {
 
   public tag?: string;
 
-  public apiKey?: string[];
+  public apiKey?: string;
 
   public data?: any[];
 }

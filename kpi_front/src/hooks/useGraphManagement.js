@@ -6,43 +6,13 @@ const useGraphManagement = () => {
   const { user } = useAuth();
 
   const fetchGraphs = async () => {
-    const response = await fetch("http://localhost:3000/graphs");
+    const response = await fetch("http://localhost:3000/graphs", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
     const data = await response.json();
-    return data.slice(-7);
-  };
-
-  const generateGraphs = async (graphs) => {
-    if (graphs) {
-      const updatedGraphs = await Promise.all(
-        graphs.map(async (graph) => {
-          const body = {
-            metric: graph.metric,
-            tag: graph.tag,
-            type: graph.type,
-            timePeriod: graph.timePeriod,
-            apiKey: user?.apiKey,
-          };
-          const response = await fetch(
-            "http://localhost:3000/graphs/aggregate",
-            {
-              method: "POST",
-              body: JSON.stringify(body),
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
-          const result = await response.json();
-          const updatedGraph = {
-            ...graph,
-            data: result[0] ? result[0].data : null,
-          };
-          return updatedGraph;
-        })
-      );
-
-      return updatedGraphs;
-    }
+    return data;
   };
 
   const {
@@ -57,6 +27,7 @@ const useGraphManagement = () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({ ...body, apiKey: "23456789" }),
     }).then((response) => {
@@ -81,6 +52,7 @@ const useGraphManagement = () => {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({ ...body, apiKey: "23456789" }),
     }).then((response) => {
@@ -94,6 +66,10 @@ const useGraphManagement = () => {
   const deleteGraphMutation = useMutation((id) => {
     return fetch(`http://localhost:3000/graphs/${id}`, {
       method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     }).then((response) => {
       if (!response.ok) {
         throw new Error("Failed to delete graph");

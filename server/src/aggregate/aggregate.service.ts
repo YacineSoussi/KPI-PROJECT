@@ -1,3 +1,4 @@
+import { ApiKeyInterceptor } from './../users/users.interceptor';
 import { Event } from './schema/event.model';
 import { Graph } from './schema/graph.model';
 import { Session } from './schema/session.model';
@@ -16,6 +17,7 @@ export class AggregateService {
     metric: string,
     timePeriod: string,
     type: string,
+    apiKey: string,
     tag?: string,
   ): Promise<any[]> {
     let chartData = {
@@ -29,13 +31,11 @@ export class AggregateService {
 
     switch (metric) {
       case 'bounceRate':
-        aggregate = await this.calculateBounceRateAggregate(timePeriod);
+        aggregate = await this.calculateBounceRateAggregate(timePeriod, apiKey);
 
         const { labelsBounce, dataBounce } =
           this.getLabelsAndDataByTimePeriodByBounceRate(aggregate, timePeriod);
 
-        console.log('aggregate', aggregate);
-        console.log('dataBounce', dataBounce);
         chartData.data.labels =
           type === 'pie'
             ? aggregate
@@ -61,6 +61,7 @@ export class AggregateService {
       case 'averageSessionDuration':
         aggregate = await this.calculateAverageSessionDurationAggregate(
           timePeriod,
+          apiKey,
         );
         chartData.data.labels = ['Durée moyenne de session'];
         chartData.data.datasets.push({
@@ -71,7 +72,7 @@ export class AggregateService {
         break;
 
       case 'pageViews':
-        aggregate = await this.calculatePageViewsAggregate(timePeriod);
+        aggregate = await this.calculatePageViewsAggregate(timePeriod, apiKey);
 
         const { labels, data } = this.getLabelsAndDataByTimePeriodByPage(
           aggregate,
@@ -103,6 +104,7 @@ export class AggregateService {
           aggregate = await this.calculateClickRateByTagAggregate(
             tag,
             timePeriod,
+            apiKey,
           );
 
           if (timePeriod === 'day') {
@@ -194,28 +196,32 @@ export class AggregateService {
         }
         break;
 
-      case 'session':
-        aggregate = await this.calculateSessionAggregate(timePeriod);
-        chartData.data.labels = aggregate.map((item: any) => item._id);
-        chartData.data.datasets.push({
-          label: 'Nombre de sessions',
-          data: aggregate.map((item: any) => item.count),
-          backgroundColor: 'rgba(75, 192, 192, 0.6)',
-        });
-        break;
+      // case 'session':
+      //   aggregate = await this.calculateSessionAggregate(timePeriod, apiKey);
+      //   chartData.data.labels = aggregate.map((item: any) => item._id);
+      //   chartData.data.datasets.push({
+      //     label: 'Nombre de sessions',
+      //     data: aggregate.map((item: any) => item.count),
+      //     backgroundColor: 'rgba(75, 192, 192, 0.6)',
+      //   });
+      //   break;
     }
 
     return [chartData];
   }
 
   //  Taux de rebond
-  private async calculateBounceRateAggregate(timePeriod?: string) {
+  private async calculateBounceRateAggregate(
+    timePeriod: string,
+    apiKey: string,
+  ) {
     const dateFormat = this.getDateFormat(timePeriod);
 
     const aggregate = await this.eventModel.aggregate([
       {
         $match: {
           type: 'pageView',
+          apiKey,
         },
       },
       {
@@ -236,12 +242,14 @@ export class AggregateService {
       };
     });
 
-    console.log(bounceRateAggregate, 'bounceRateAggregate');
     return bounceRateAggregate;
   }
 
   // Durée moyenne de la session
-  private async calculateAverageSessionDurationAggregate(timePeriod?: string) {
+  private async calculateAverageSessionDurationAggregate(
+    timePeriod: string,
+    apiKey: string,
+  ) {
     const aggregate = await this.sessionModel.aggregate([
       {
         $group: {
@@ -251,17 +259,20 @@ export class AggregateService {
       },
       { $match: this.getTimePeriodMatch(timePeriod) },
     ]);
-    console.log(aggregate, 'aggregate');
     return aggregate;
   }
 
   // Nombre de pages vues
-  private async calculatePageViewsAggregate(timePeriod?: string) {
+  private async calculatePageViewsAggregate(
+    timePeriod: string,
+    apiKey: string,
+  ) {
     const dateFormat = this.getDateFormat(timePeriod);
     const aggregate = await this.eventModel.aggregate([
       {
         $match: {
           type: 'pageView',
+          apiKey,
         },
       },
       {
@@ -286,12 +297,13 @@ export class AggregateService {
 
   private async calculateClickRateByTagAggregate(
     tag: string,
-    timePeriod?: string,
+    timePeriod: string,
+    apiKey: string,
   ): Promise<{ period: string; clickRate: number; timePeriod: string }[]> {
     const dateFormat = this.getDateFormat(timePeriod);
 
     const aggregate = await this.eventModel.aggregate([
-      { $match: { type: 'click', tag } },
+      { $match: { type: 'click', tag, apiKey } },
       {
         $group: {
           _id: {
@@ -312,31 +324,31 @@ export class AggregateService {
   }
 
   // Nombre de sessions
-  private async calculateSessionAggregate(timePeriod?: string) {
-    let groupBy = { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } };
+  // private async calculateSessionAggregate(timePeriod: string, apiKey: string) {
+  //   let groupBy = { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } };
 
-    if (timePeriod === 'month') {
-      groupBy = { $dateToString: { format: '%Y-%m', date: '$createdAt' } };
-    } else if (timePeriod === 'year') {
-      groupBy = { $dateToString: { format: '%Y', date: '$createdAt' } };
-    }
+  //   if (timePeriod === 'month') {
+  //     groupBy = { $dateToString: { format: '%Y-%m', date: '$createdAt' } };
+  //   } else if (timePeriod === 'year') {
+  //     groupBy = { $dateToString: { format: '%Y', date: '$createdAt' } };
+  //   }
 
-    const aggregate = await this.sessionModel.aggregate([
-      {
-        $match: this.getTimePeriodMatch(timePeriod),
-      },
-      {
-        $group: {
-          _id: groupBy,
-          count: { $sum: 1 },
-        },
-      },
-    ]);
+  //   const aggregate = await this.sessionModel.aggregate([
+  //     {
+  //       $match: this.getTimePeriodMatch(timePeriod),
+  //     },
+  //     {
+  //       $group: {
+  //         _id: groupBy,
+  //         count: { $sum: 1 },
+  //       },
+  //     },
+  //   ]);
 
-    return aggregate;
-  }
+  //   return aggregate;
+  // }
 
-  private getTimePeriodMatch(timePeriod?: string) {
+  private getTimePeriodMatch(timePeriod: string) {
     let matchCondition = {};
 
     if (timePeriod === 'day') {

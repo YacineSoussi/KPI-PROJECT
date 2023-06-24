@@ -14,6 +14,9 @@ export class Graph {
   timePeriod: string;
 
   @Prop()
+  apiKey: string;
+
+  @Prop()
   tag?: string;
 }
 
