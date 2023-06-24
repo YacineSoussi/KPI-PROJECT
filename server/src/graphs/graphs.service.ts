@@ -23,7 +23,6 @@ export class GraphsService {
     const updatedGraphs = await Promise.all(
       graphs.map(async (graph) => {
         const data = await this.generateGraphsAggregate(graph);
-        console.log(graph);
         data[0]['id'] = graph._id;
         data[0]['tag'] = graph?.tag;
         return { data };
@@ -35,10 +34,9 @@ export class GraphsService {
   async generateGraphsAggregate(
     CreateGraphDto: CreateGraphDto,
   ): Promise<any[]> {
-    const { metric, dimension, timePeriod, type, tag } = CreateGraphDto;
+    const { metric, timePeriod, type, tag } = CreateGraphDto;
     return this.aggregateService.generateDynamicAggregate(
       metric,
-      dimension,
       timePeriod,
       type,
       tag,

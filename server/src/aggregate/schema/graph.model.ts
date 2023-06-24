@@ -11,9 +11,6 @@ export class Graph {
   type: string;
 
   @Prop({ required: true })
-  dimension: string;
-
-  @Prop({ required: true })
   timePeriod: string;
 
   @Prop()

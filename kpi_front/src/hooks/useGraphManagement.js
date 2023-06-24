@@ -19,7 +19,6 @@ const useGraphManagement = () => {
             metric: graph.metric,
             tag: graph.tag,
             type: graph.type,
-            dimension: graph.dimension,
             timePeriod: graph.timePeriod,
             apiKey: user?.apiKey,
           };

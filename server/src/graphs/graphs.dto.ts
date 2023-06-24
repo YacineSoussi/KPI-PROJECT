@@ -11,10 +11,6 @@ export class CreateGraphDto {
 
   @IsDefined()
   @IsString()
-  public dimension: string;
-
-  @IsDefined()
-  @IsString()
   public timePeriod: string;
 
   public tag?: string;

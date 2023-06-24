@@ -26,7 +26,7 @@ const OtherComponent = () => {
 };
 
 const Main = () => {
-  const apiKey = 'xxx';
+  const apiKey = 'kgq5bq5ximpeggdm0wcc';
   return (
     <>
       <AnalyticsProvider apiKey={apiKey}>

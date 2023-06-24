@@ -3,6 +3,7 @@ import { Graph } from './schema/graph.model';
 import { Session } from './schema/session.model';
 import { Model } from 'mongoose';
 import { Inject } from '@nestjs/common';
+import { cp } from 'fs';
 
 export class AggregateService {
   constructor(
@@ -13,7 +14,6 @@ export class AggregateService {
 
   async generateDynamicAggregate(
     metric: string,
-    dimension: string,
     timePeriod: string,
     type: string,
     tag?: string,
@@ -69,22 +69,88 @@ export class AggregateService {
 
           if (timePeriod === 'day') {
             const { labels, data } = this.getLabelsAndDataByHour(aggregate);
+            chartData.data.labels =
+              type === 'pie'
+                ? aggregate
+                    .map((item: any) => {
+                      const hhMM = item.period.split(' ')[1];
+                      return hhMM.split(':')[0] + 'h';
+                    })
+                    .filter((value: string, index: number, self: string[]) => {
+                      return self.indexOf(value) === index;
+                    })
+                    .sort((a: string, b: string) => {
+                      if (a === '00h') {
+                        return 1;
+                      } else if (b === '00h') {
+                        return -1;
+                      } else {
+                        return (
+                          Number(a.split('h')[0]) - Number(b.split('h')[0])
+                        );
+                      }
+                    })
+                : labels;
 
-            chartData.data.labels = labels;
             chartData.data.datasets.push({
-              label: 'Nombre de clics',
-              data,
-              backgroundColor: 'rgba(75, 192, 192, 0.6)',
+              label: tag ? `Nombre de clics pour ${tag} par heure` : '',
+              data:
+                type === 'pie'
+                  ? data.filter((item) => {
+                      return item !== 0 && item !== undefined;
+                    })
+                  : data,
+              backgroundColor:
+                type === 'pie'
+                  ? this.getColors(data.filter((value: number) => value > 0))
+                  : this.getRandomColor(),
             });
-          } else {
+          }
+
+          if (timePeriod === 'week') {
+            const { labels, data } = this.getLabelsAndDataByDay(aggregate);
+            chartData.data.labels =
+              type === 'pie'
+                ? aggregate.map((item: any) => item.period)
+                : labels;
+            chartData.data.datasets.push({
+              label: tag
+                ? `Nombre de clics pour ${tag} par semaine`
+                : 'Nombre de clics par semaine',
+              data:
+                type === 'pie'
+                  ? data.filter((item) => {
+                      return item !== 0 && item !== undefined;
+                    })
+                  : data,
+              backgroundColor:
+                type === 'pie'
+                  ? this.getColors(data.filter((value: number) => value > 0))
+                  : this.getRandomColor(),
+            });
+          }
+
+          if (timePeriod === 'month') {
+            const { labels, data } = this.getLabelsAndDataByMonth(aggregate);
+
             chartData.data.labels =
               type === 'pie'
                 ? aggregate.map((item: any) => item.period)
                 : this.getLabels(timePeriod);
             chartData.data.datasets.push({
-              label: timePeriod === 'day' ? 'Nombre de clics' : 'Taux de clics',
-              data: aggregate.map((item: any) => item.clickRate),
-              backgroundColor: 'rgba(75, 192, 192, 0.6)',
+              label: tag
+                ? `Nombre de clics pour ${tag} par mois`
+                : 'Nombre de clics par mois',
+              data:
+                type === 'pie'
+                  ? data.filter((item) => {
+                      return item !== 0 && item !== undefined;
+                    })
+                  : data,
+              backgroundColor:
+                type === 'pie'
+                  ? this.getColors(data.filter((value: number) => value > 0))
+                  : this.getRandomColor(),
             });
           }
         } else {
@@ -193,14 +259,12 @@ export class AggregateService {
         },
       },
     ]);
-    console.log(aggregate, 'aggregate');
     const result = aggregate.map((item: any, index: number) => ({
       period: item._id,
       clickRate: item.count,
       timePeriod,
     }));
 
-    console.log(result, 'result');
     return result;
   }
 
@@ -348,15 +412,8 @@ export class AggregateService {
   }
 
   /**
-   * | [
-  { _id: '20/05/2023 22:59', count: 1 },
-{ _id: '22/06/2023 20:42', count: 3 },
-{ _id: '21/05/2023 16:36', count: 1 },
-k{ _id: '21/05/2023 15:16', count: 1 },
-{ _id: '20/05/2023 23:02', count: 2 }
-] aggregate
-   * @param aggregate 
-   * @returns 
+   * @param aggregate
+   * @returns
    */
   private getLabelsAndDataByHour(aggregate: any[]): {
     labels: string[];
@@ -364,13 +421,98 @@ k{ _id: '21/05/2023 15:16', count: 1 },
   } {
     const labels = this.getLabels('day');
     const data = labels.map((label) => {
-      const item = aggregate.find((item) => {
+      const items = aggregate.filter((item) => {
         return item.period.split(' ')[1].split(':')[0] === label.split(':')[0];
       });
-      console.log(item, 'ITEM');
+      const totalClickRate = items.reduce(
+        (total, item) => total + item.clickRate,
+        0,
+      );
+      return totalClickRate;
+    });
+
+    return { labels, data };
+  }
+  private getLabelsAndDataByDay(aggregate: any[]): {
+    labels: string[];
+    data: number[];
+  } {
+    const labels = this.getLabels('week');
+    const data = labels.map((label) => {
+      const weekNumber = parseInt(label.split(' ')[1]); // Récupérer le numéro de semaine à partir de l'étiquette
+      const item = aggregate.find((item) => {
+        const itemWeekNumber = this.getWeekNumberFromDate(item.period);
+        return itemWeekNumber === weekNumber;
+      });
       return item ? item.clickRate : 0;
     });
-    console.log(data, 'DATA');
     return { labels, data };
+  }
+
+  private getLabelsAndDataByMonth(aggregate: any[]): {
+    labels: string[];
+    data: number[];
+  } {
+    const labels = this.getLabels('month');
+    const data = labels.map((label) => {
+      const item = aggregate.find((item) => {
+        const month = this.getMonthNumberFromDate(item.period);
+        return month === label;
+      });
+      return item ? item.clickRate : 0;
+    });
+    return { labels, data };
+  }
+
+  private getWeekNumberFromDate(dateString: string): number {
+    const [day, month] = dateString.split('/');
+    const date = new Date(
+      new Date().getFullYear(),
+      parseInt(month) - 1,
+      parseInt(day),
+    );
+    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+    const pastDaysOfYear =
+      (date.getTime() - firstDayOfYear.getTime()) / 86400000;
+    const weekNumber = Math.floor(pastDaysOfYear / 7) + 1;
+
+    if (weekNumber > 28) {
+      return 4;
+    } else if (weekNumber > 21) {
+      return 3;
+    } else if (weekNumber > 14) {
+      return 2;
+    } else {
+      return 1;
+    }
+  }
+
+  private getMonthNumberFromDate(dateString: string): string {
+    const [month, year] = dateString.split('/');
+    // get string month from number
+    const monthString = new Date(
+      new Date().getFullYear(),
+      parseInt(month) - 1,
+      1,
+    );
+    return monthString.toLocaleString('default', { month: 'short' });
+  }
+
+  private getColors(data: number[]): string[] {
+    return data.map((i) => {
+      if (i === 0) {
+        return;
+      }
+      return this.getRandomColor();
+    });
+  }
+
+  private getRandomColor(): string {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.round(Math.random() * 15)];
+    }
+    return color;
   }
 }
