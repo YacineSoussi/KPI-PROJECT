@@ -52,12 +52,20 @@ export class AggregateService {
 
       case 'pageViews':
         aggregate = await this.calculatePageViewsAggregate(timePeriod);
-        chartData.data.labels = ['Nombre de pages vues'];
+        console.log(aggregate, 'pageViews');
+        const pageViewsData = aggregate.map((item) => item.pageViews);
+        const pageViewsLabels = aggregate.map((item) => item.period);
+
+        chartData.data.labels = pageViewsLabels;
         chartData.data.datasets.push({
           label: 'Nombre de pages vues',
-          data: [aggregate[0]?.totalPageViews || 0],
-          backgroundColor: 'rgba(75, 192, 192, 0.6)',
+          data: pageViewsData,
+          backgroundColor:
+            type === 'pie'
+              ? this.getColors(pageViewsData)
+              : this.getRandomColor(),
         });
+
         break;
 
       case 'clickRate':
@@ -153,14 +161,6 @@ export class AggregateService {
                   : this.getRandomColor(),
             });
           }
-        } else {
-          aggregate = await this.calculateGlobalClickRateAggregate(timePeriod);
-          chartData.data.labels = ['Taux de clics global'];
-          chartData.data.datasets.push({
-            label: 'Taux de clics global',
-            data: [aggregate[0]?.totalSessions || 0],
-            backgroundColor: 'rgba(75, 192, 192, 0.6)',
-          });
         }
         break;
 
@@ -227,26 +227,40 @@ export class AggregateService {
 
   // Nombre de pages vues
   private async calculatePageViewsAggregate(timePeriod?: string) {
-    const aggregate = await this.sessionModel.aggregate([
+    const dateFormat = this.getDateFormat(timePeriod);
+    const aggregate = await this.eventModel.aggregate([
+      // Étape d'agrégation pour compter les pageViews par session
       {
-        $group: {
-          _id: null,
-          totalPageViews: { $sum: '$pageViews' },
+        $match: {
+          type: 'pageView', // Filtrer uniquement les événements de type "pageView"
         },
       },
-      { $match: this.getTimePeriodMatch(timePeriod) },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: dateFormat, date: '$createdAt' },
+          },
+          count: { $sum: 1 },
+          page: { $first: '$page' },
+        },
+      },
     ]);
 
-    return aggregate;
+    const result = aggregate.map((item: any, index: number) => ({
+      period: item._id,
+      pageViews: item.count,
+      timePeriod,
+      page: item.page,
+    }));
+    console.log(result);
+    return result;
   }
 
-  // Taux de clics par tag
   private async calculateClickRateByTagAggregate(
     tag: string,
     timePeriod?: string,
   ): Promise<{ period: string; clickRate: number; timePeriod: string }[]> {
     const dateFormat = this.getDateFormat(timePeriod);
-    const labels = this.getLabels(timePeriod);
 
     const aggregate = await this.eventModel.aggregate([
       { $match: { type: 'click', tag } },
@@ -259,6 +273,7 @@ export class AggregateService {
         },
       },
     ]);
+
     const result = aggregate.map((item: any, index: number) => ({
       period: item._id,
       clickRate: item.count,
@@ -266,36 +281,6 @@ export class AggregateService {
     }));
 
     return result;
-  }
-
-  // Taux de clics global
-  private async calculateGlobalClickRateAggregate(timePeriod?: string) {
-    const aggregate = await this.eventModel.aggregate([
-      // Étape d'agrégation pour compter le nombre total de clics
-      {
-        $match: {
-          type: 'click',
-          ...this.getTimePeriodMatch(timePeriod),
-        },
-      },
-      // Étape d'agrégation pour compter le nombre total de sessions avec clics
-      {
-        $group: {
-          _id: '$sessionId',
-          count: { $sum: 1 },
-        },
-      },
-      // Étape d'agrégation pour compter le nombre total de sessions avec clics
-      {
-        $group: {
-          _id: null,
-          totalSessions: { $sum: 1 },
-        },
-      },
-      // Autres étapes d'agrégation au besoin
-    ]);
-
-    return aggregate;
   }
 
   // Nombre de sessions
