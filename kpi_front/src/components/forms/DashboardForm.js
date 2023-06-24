@@ -87,6 +87,7 @@ function DashboardForm({ tags, onAdd }) {
               <option value="month">Par mois</option>
             ) : (
               <>
+                <option value="month">Par mois</option>
                 <option value="day">Par jour</option>
                 <option value="week">Par semaine</option>
               </>

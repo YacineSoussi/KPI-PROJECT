@@ -262,7 +262,6 @@ export class AggregateService {
       timePeriod,
       page: item.page,
     }));
-    console.log(result);
     return result;
   }
 
@@ -519,9 +518,6 @@ export class AggregateService {
     const data = labels.map((label) => {
       const item = aggregate.find((item) => {
         const month = this.getMonthNumberFromDate(item.period);
-        console.log(item, 'item', 'label', label);
-        console.log(month, 'month');
-
         return month === label;
       });
       return item ? item.pageViews : 0;
