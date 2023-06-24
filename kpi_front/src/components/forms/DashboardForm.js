@@ -5,7 +5,7 @@ function DashboardForm({ tags, onAdd }) {
   const [selectedMetric, setSelectedMetric] = useState("clickRate");
   const [selectedTag, setSelectedTag] = useState(tags[0].name);
   const [selectedChartType, setSelectedChartType] = useState("line");
-  const [selectedTimePeriod, setSelectedTimePeriod] = useState("day");
+  const [selectedTimePeriod, setSelectedTimePeriod] = useState("month");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -83,7 +83,8 @@ function DashboardForm({ tags, onAdd }) {
             value={selectedTimePeriod}
             onChange={(event) => setSelectedTimePeriod(event.target.value)}
           >
-            {selectedMetric === "pageViews" ? (
+            {selectedMetric === "pageViews" ||
+            selectedMetric === "bounceRate" ? (
               <option value="month">Par mois</option>
             ) : (
               <>

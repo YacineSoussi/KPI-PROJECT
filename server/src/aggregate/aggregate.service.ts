@@ -30,11 +30,31 @@ export class AggregateService {
     switch (metric) {
       case 'bounceRate':
         aggregate = await this.calculateBounceRateAggregate(timePeriod);
-        chartData.data.labels = ['Taux de rebond'];
+
+        const { labelsBounce, dataBounce } =
+          this.getLabelsAndDataByTimePeriodByBounceRate(aggregate, timePeriod);
+
+        console.log('aggregate', aggregate);
+        console.log('dataBounce', dataBounce);
+        chartData.data.labels =
+          type === 'pie'
+            ? aggregate
+                .filter((value) => value.bounceRate > 0)
+                .map((item: any) => item.period)
+            : this.getLabels(timePeriod);
+
         chartData.data.datasets.push({
           label: 'Taux de rebond',
-          data: [aggregate.length],
-          backgroundColor: 'rgba(75, 192, 192, 0.6)',
+          data:
+            type === 'pie'
+              ? dataBounce.filter((item) => {
+                  return item !== 0 && item !== undefined;
+                })
+              : dataBounce,
+          backgroundColor:
+            type === 'pie'
+              ? this.getColors(dataBounce.filter((value: number) => value > 0))
+              : this.getRandomColor(),
         });
         break;
 
@@ -190,8 +210,10 @@ export class AggregateService {
 
   //  Taux de rebond
   private async calculateBounceRateAggregate(timePeriod?: string) {
+    const dateFormat = this.getDateFormat(timePeriod);
+
     const aggregate = await this.eventModel.aggregate([
-      // Étape d'agrégation pour compter les pageViews par session
+      // Étape d'agrégation pour calculer le taux de rebond avec la période de temps
       {
         $match: {
           type: 'pageView', // Filtrer uniquement les événements de type "pageView"
@@ -199,23 +221,75 @@ export class AggregateService {
       },
       {
         $group: {
-          _id: '$sessionId',
-          pageCount: { $sum: 1 }, // Compter le nombre de pageViews dans chaque session
+          _id: {
+            $dateToString: { format: dateFormat, date: '$createdAt' },
+          },
+          sessions: { $addToSet: '$sessionId' }, // Collecter les sessions uniques
+          pageViews: { $sum: 1 }, // Compter le nombre total de page views
         },
       },
-      // Étape d'agrégation pour filtrer les sessions avec une seule pageView (taux de rebond)
-      {
-        $match: {
-          pageCount: 1,
-        },
-      },
-      // Ajoutez d'autres étapes d'agrégation au besoin
-      { $match: this.getTimePeriodMatch(timePeriod) },
-      // Autres étapes d'agrégation
     ]);
 
-    return aggregate;
+    const bounceRateAggregate = aggregate.map((item: any) => {
+      return {
+        period: item._id,
+        bounceRate: item.pageViews === 1 ? 1 : 0,
+      };
+    });
+
+    console.log(bounceRateAggregate, 'bounceRateAggregate');
+    return bounceRateAggregate;
   }
+
+  /*
+kpi-server-1  | [
+kpi-server-1  |   {
+kpi-server-1  |     _id: '24/06/2023 12:36',
+kpi-server-1  |     sessions: [ '0fa8a0ea-b357-4a0b-958f-0670859b45b0' ],
+kpi-server-1  |     pageViews: 1
+kpi-server-1  |   },
+kpi-server-1  |   {
+kpi-server-1  |     _id: '24/06/2023 12:30',
+kpi-server-1  |     sessions: [ '0fa8a0ea-b357-4a0b-958f-0670859b45b0' ],
+kpi-server-1  |     pageViews: 1
+kpi-server-1  |   },
+kpi-server-1  |   {
+kpi-server-1  |     _id: '24/06/2023 12:25',
+kpi-server-1  |     sessions: [ 'f9423b85-e0dc-4e53-8443-a72005e83ca5' ],
+kpi-server-1  |     pageViews: 1
+kpi-server-1  |   },
+kpi-server-1  |   {
+kpi-server-1  |     _id: '24/06/2023 12:34',
+kpi-server-1  |     sessions: [ '0fa8a0ea-b357-4a0b-958f-0670859b45b0' ],
+kpi-server-1  |     pageViews: 2
+kpi-server-1  |   },
+kpi-server-1  |   {
+kpi-server-1  |     _id: '24/06/2023 12:27',
+kpi-server-1  |     sessions: [ '0fa8a0ea-b357-4a0b-958f-0670859b45b0' ],
+kpi-server-1  |     pageViews: 2
+kpi-server-1  |   },
+kpi-server-1  |   {
+kpi-server-1  |     _id: '24/06/2023 14:34',
+kpi-server-1  |     sessions: [ '0fa8a0ea-b357-4a0b-958f-0670859b45b0' ],
+kpi-server-1  |     pageViews: 1
+kpi-server-1  |   },
+kpi-server-1  |   {
+kpi-server-1  |     _id: '24/06/2023 12:26',
+kpi-server-1  |     sessions: [ '0fa8a0ea-b357-4a0b-958f-0670859b45b0' ],
+kpi-server-1  |     pageViews: 2
+kpi-server-1  |   },
+kpi-server-1  |   {
+kpi-server-1  |     _id: '24/06/2023 15:04',
+kpi-server-1  |     sessions: [ '0fa8a0ea-b357-4a0b-958f-0670859b45b0' ],
+kpi-server-1  |     pageViews: 1
+kpi-server-1  |   },
+kpi-server-1  |   {
+kpi-server-1  |     _id: '24/06/2023 13:35',
+kpi-server-1  |     sessions: [ '0fa8a0ea-b357-4a0b-958f-0670859b45b0' ],
+kpi-server-1  |     pageViews: 1
+kpi-server-1  |   }
+kpi-server-1  | ] aggregate
+*/
 
   // Durée moyenne de la session
   private async calculateAverageSessionDurationAggregate(timePeriod?: string) {
@@ -523,5 +597,22 @@ export class AggregateService {
       return item ? item.pageViews : 0;
     });
     return { labels, data };
+  }
+
+  private getLabelsAndDataByTimePeriodByBounceRate(
+    aggregate: any[],
+    timePeriod: string,
+  ): { labelsBounce: string[]; dataBounce: number[] } {
+    const labelsBounce = this.getLabels(timePeriod);
+
+    const dataBounce = labelsBounce.map((label) => {
+      const item = aggregate.find((item) => {
+        const month = this.getMonthNumberFromDate(item.period);
+        return month === label;
+      });
+      return item ? item.bounceRate : 0;
+    });
+
+    return { labelsBounce, dataBounce };
   }
 }
