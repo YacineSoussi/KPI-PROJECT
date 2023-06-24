@@ -2,9 +2,7 @@ import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
 export class CreateEventDto {
-  @IsString()
-  @IsNotEmpty()
-  tag: string;
+  tag?: string;
 
   @IsString()
   @IsNotEmpty()
@@ -45,7 +43,6 @@ export class CreateEventDto {
   @IsString()
   @IsOptional()
   device: string;
-  
 }
 
 export class UpdateEventDto extends PartialType(CreateEventDto) {}

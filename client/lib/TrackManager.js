@@ -142,17 +142,24 @@ class TrackManager {
   trackPageView = () => {
     const page = window.location.pathname;
     const eventData = {
-      tag: "pageView",
-      type: page,
+      type: "pageView",
+      page,
       apiKey: this.apiKey,
-      visitorId: localStorage.getItem("visitorId"),
-      sessionId: localStorage.getItem("sessionId"),
+      visitorId: getCookie("visitorId"),
+      sessionId: getCookie("sessionId"),
     };
 
     this.trackEvent({
       uri: "events",
       ...eventData,
     });
+  };
+
+  isMobileDevice = () => {
+    return (
+      typeof window.orientation !== "undefined" ||
+      navigator.userAgent.indexOf("IEMobile") !== -1
+    );
   };
 
   trackSession = () => {
@@ -169,7 +176,6 @@ class TrackManager {
     } else {
       visitorId = visitorIdCookie;
     }
-
     let sessionId;
     if (sessionCookie) {
       sessionId = sessionCookie;
@@ -181,7 +187,6 @@ class TrackManager {
       setCookie(sessionCookieName, sessionId);
     }
 
-    // // Gestion de l'événement de changement de visibilité
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden") {
         const sessionStartTime = getCookie(sessionCookieName);
@@ -205,17 +210,44 @@ class TrackManager {
       }
     };
 
+    const handleBeforeUnload = () => {
+      const sessionStartTime = getCookie(sessionCookieName);
+      const endTime = Date.now();
+
+      this.trackEvent({
+        uri: "sessions",
+        data: {
+          event: "session",
+          sessionId,
+          startTime: sessionStartTime,
+          endTime,
+          duration: endTime - sessionStartTime,
+          apiKey: this.apiKey,
+          visitorId,
+        },
+      });
+
+      deleteCookie(sessionCookieName);
+      localStorage.removeItem(sessionCookieName);
+    };
+
+    const handleBeforeUnloadWrapper = () => {
+      handleBeforeUnload();
+    };
     // Encapsule handleVisibilityChange dans une fonction pour pouvoir utiliser sessionEnded
     const handleBeforeVisibilityChangeWrapper = () => {
       handleVisibilityChange(sessionEnded);
     };
 
-    // L'utilisateur est sur un téléphone mobile
-    addEventListener(
-      document,
-      "visibilitychange",
-      handleBeforeVisibilityChangeWrapper
-    );
+    if (this.isMobileDevice()) {
+      addEventListener(
+        document,
+        "visibilitychange",
+        handleBeforeVisibilityChangeWrapper
+      );
+    } else {
+      addEventListener(document, "beforeunload", handleBeforeUnloadWrapper);
+    }
 
     // Fonction de nettoyage
     const cleanup = () => {
@@ -224,6 +256,7 @@ class TrackManager {
         "visibilitychange",
         handleBeforeVisibilityChangeWrapper
       );
+      removeEventListener(document, "beforeunload", handleBeforeUnload);
     };
 
     // Retourner la fonction de nettoyage
@@ -231,8 +264,8 @@ class TrackManager {
   };
 
   init = () => {
-    this.trackPageView();
     const cleanup = this.trackSession();
+    this.trackPageView();
     return () => {
       cleanup();
     };

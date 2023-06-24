@@ -5,8 +5,8 @@ export type EventDocument = Event & Document;
 
 @Schema()
 export class Event {
-  @Prop({ required: true })
-  tag: string;
+  @Prop()
+  tag?: string;
 
   @Prop({ required: true })
   type: string;
@@ -40,7 +40,6 @@ export class Event {
 
   @Prop({ required: false })
   device: string;
-  
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);

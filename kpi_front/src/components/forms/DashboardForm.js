@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useQuery } from "react-query";
 
 function DashboardForm({ tags, onAdd }) {
-  const [selectedMetric, setSelectedMetric] = useState("bounceRate");
+  const [selectedMetric, setSelectedMetric] = useState("clickRate");
   const [selectedTag, setSelectedTag] = useState(tags[0].name);
   const [selectedChartType, setSelectedChartType] = useState("line");
   const [selectedTimePeriod, setSelectedTimePeriod] = useState("day");
@@ -34,12 +34,12 @@ function DashboardForm({ tags, onAdd }) {
             value={selectedMetric}
             onChange={(event) => setSelectedMetric(event.target.value)}
           >
+            <option value="clickRate">Nombre de clics</option>
             <option value="bounceRate">Taux de rebond</option>
             <option value="averageSessionDuration">
               Durée moyenne de session
             </option>
             <option value="pageViews">Nombre de pages vues</option>
-            <option value="clickRate">Taux de clic</option>
             <option value="session">Sessions</option>
           </select>
         </div>
