@@ -213,10 +213,9 @@ export class AggregateService {
     const dateFormat = this.getDateFormat(timePeriod);
 
     const aggregate = await this.eventModel.aggregate([
-      // Étape d'agrégation pour calculer le taux de rebond avec la période de temps
       {
         $match: {
-          type: 'pageView', // Filtrer uniquement les événements de type "pageView"
+          type: 'pageView',
         },
       },
       {
@@ -224,8 +223,8 @@ export class AggregateService {
           _id: {
             $dateToString: { format: dateFormat, date: '$createdAt' },
           },
-          sessions: { $addToSet: '$sessionId' }, // Collecter les sessions uniques
-          pageViews: { $sum: 1 }, // Compter le nombre total de page views
+          sessions: { $addToSet: '$sessionId' },
+          pageViews: { $sum: 1 },
         },
       },
     ]);
@@ -241,71 +240,18 @@ export class AggregateService {
     return bounceRateAggregate;
   }
 
-  /*
-kpi-server-1  | [
-kpi-server-1  |   {
-kpi-server-1  |     _id: '24/06/2023 12:36',
-kpi-server-1  |     sessions: [ '0fa8a0ea-b357-4a0b-958f-0670859b45b0' ],
-kpi-server-1  |     pageViews: 1
-kpi-server-1  |   },
-kpi-server-1  |   {
-kpi-server-1  |     _id: '24/06/2023 12:30',
-kpi-server-1  |     sessions: [ '0fa8a0ea-b357-4a0b-958f-0670859b45b0' ],
-kpi-server-1  |     pageViews: 1
-kpi-server-1  |   },
-kpi-server-1  |   {
-kpi-server-1  |     _id: '24/06/2023 12:25',
-kpi-server-1  |     sessions: [ 'f9423b85-e0dc-4e53-8443-a72005e83ca5' ],
-kpi-server-1  |     pageViews: 1
-kpi-server-1  |   },
-kpi-server-1  |   {
-kpi-server-1  |     _id: '24/06/2023 12:34',
-kpi-server-1  |     sessions: [ '0fa8a0ea-b357-4a0b-958f-0670859b45b0' ],
-kpi-server-1  |     pageViews: 2
-kpi-server-1  |   },
-kpi-server-1  |   {
-kpi-server-1  |     _id: '24/06/2023 12:27',
-kpi-server-1  |     sessions: [ '0fa8a0ea-b357-4a0b-958f-0670859b45b0' ],
-kpi-server-1  |     pageViews: 2
-kpi-server-1  |   },
-kpi-server-1  |   {
-kpi-server-1  |     _id: '24/06/2023 14:34',
-kpi-server-1  |     sessions: [ '0fa8a0ea-b357-4a0b-958f-0670859b45b0' ],
-kpi-server-1  |     pageViews: 1
-kpi-server-1  |   },
-kpi-server-1  |   {
-kpi-server-1  |     _id: '24/06/2023 12:26',
-kpi-server-1  |     sessions: [ '0fa8a0ea-b357-4a0b-958f-0670859b45b0' ],
-kpi-server-1  |     pageViews: 2
-kpi-server-1  |   },
-kpi-server-1  |   {
-kpi-server-1  |     _id: '24/06/2023 15:04',
-kpi-server-1  |     sessions: [ '0fa8a0ea-b357-4a0b-958f-0670859b45b0' ],
-kpi-server-1  |     pageViews: 1
-kpi-server-1  |   },
-kpi-server-1  |   {
-kpi-server-1  |     _id: '24/06/2023 13:35',
-kpi-server-1  |     sessions: [ '0fa8a0ea-b357-4a0b-958f-0670859b45b0' ],
-kpi-server-1  |     pageViews: 1
-kpi-server-1  |   }
-kpi-server-1  | ] aggregate
-*/
-
   // Durée moyenne de la session
   private async calculateAverageSessionDurationAggregate(timePeriod?: string) {
     const aggregate = await this.sessionModel.aggregate([
-      // Étape d'agrégation pour calculer la durée moyenne de session avec la période de temps
       {
         $group: {
           _id: null,
           averageSessionDuration: { $avg: '$duration' },
         },
       },
-      // Ajoutez d'autres étapes d'agrégation au besoin
       { $match: this.getTimePeriodMatch(timePeriod) },
-      // Autres étapes d'agrégation
     ]);
-
+    console.log(aggregate, 'aggregate');
     return aggregate;
   }
 
@@ -313,10 +259,9 @@ kpi-server-1  | ] aggregate
   private async calculatePageViewsAggregate(timePeriod?: string) {
     const dateFormat = this.getDateFormat(timePeriod);
     const aggregate = await this.eventModel.aggregate([
-      // Étape d'agrégation pour compter les pageViews par session
       {
         $match: {
-          type: 'pageView', // Filtrer uniquement les événements de type "pageView"
+          type: 'pageView',
         },
       },
       {
@@ -507,7 +452,7 @@ kpi-server-1  | ] aggregate
   } {
     const labels = this.getLabels('week');
     const data = labels.map((label) => {
-      const weekNumber = parseInt(label.split(' ')[1]); // Récupérer le numéro de semaine à partir de l'étiquette
+      const weekNumber = parseInt(label.split(' ')[1]);
       const item = aggregate.find((item) => {
         const itemWeekNumber = this.getWeekNumberFromDate(item.period);
         return itemWeekNumber === weekNumber;
@@ -557,7 +502,6 @@ kpi-server-1  | ] aggregate
 
   private getMonthNumberFromDate(dateString: string): string {
     const [month, year] = dateString.split('/');
-    // get string month from number
     const monthString = new Date(
       new Date().getFullYear(),
       parseInt(month) - 1,

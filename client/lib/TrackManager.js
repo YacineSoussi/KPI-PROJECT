@@ -226,14 +226,11 @@ class TrackManager {
           visitorId,
         },
       });
-
+      alert("stop");
       deleteCookie(sessionCookieName);
       localStorage.removeItem(sessionCookieName);
     };
 
-    const handleBeforeUnloadWrapper = () => {
-      handleBeforeUnload();
-    };
     // Encapsule handleVisibilityChange dans une fonction pour pouvoir utiliser sessionEnded
     const handleBeforeVisibilityChangeWrapper = () => {
       handleVisibilityChange(sessionEnded);
@@ -246,7 +243,8 @@ class TrackManager {
         handleBeforeVisibilityChangeWrapper
       );
     } else {
-      addEventListener(document, "beforeunload", handleBeforeUnloadWrapper);
+      console.log("desktop");
+      addEventListener(document, "beforeunload", handleBeforeUnload);
     }
 
     // Fonction de nettoyage
