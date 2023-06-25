@@ -3,7 +3,7 @@ import TrackManager from '../lib/TrackManager.js'
 
 export const AnalyticsContext = createContext(null);
 
-const AnalyticsProvider = ({ children, apiKey }) => {
+export const AnalyticsProvider = ({ children, apiKey }) => {
 
   const trackManager = useMemo(() => new TrackManager(apiKey), [apiKey]);
 
@@ -25,4 +25,3 @@ const AnalyticsProvider = ({ children, apiKey }) => {
 };
 
 
-export default AnalyticsProvider;

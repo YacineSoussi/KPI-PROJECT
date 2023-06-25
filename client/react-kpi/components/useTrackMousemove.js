@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { AnalyticsContext } from "./AnalyticsProvider";
 
-const useTrackMousemove = () => {
+export const useTrackMousemove = () => {
   const trackManager = useContext(AnalyticsContext);
 
   useEffect(() => {
@@ -14,5 +14,3 @@ const useTrackMousemove = () => {
 
   return null;
 };
-
-export default useTrackMousemove;

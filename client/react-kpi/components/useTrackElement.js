@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef } from "react";
 import { AnalyticsContext } from "./AnalyticsProvider";
 
-const useTrackElement = (eventTag, eventType) => {
+export const useTrackElement = (eventTag, eventType) => {
   const trackManager = useContext(AnalyticsContext);
 
   const ref = useRef(null);
@@ -19,5 +19,3 @@ const useTrackElement = (eventTag, eventType) => {
 
   return ref;
 };
-
-export default useTrackElement;

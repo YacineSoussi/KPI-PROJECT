@@ -1,8 +1,6 @@
 import React, { useRef, useContext } from "react";
 import ReactDOM from "react-dom/client";
-import AnalyticsProvider from "./components/AnalyticsProvider";
-import useTrackElement from "./components/useTrackElement";
-import useTrackMousemove from "./components/useTrackMousemove";
+import { AnalyticsProvider, useTrackElement, useTrackMousemove } from 'react-kpi';
 
 const OtherComponent = () => {
 
