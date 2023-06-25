@@ -10,6 +10,7 @@ import { AuthenticationModule } from './authentication/authentication.module';
 import { TagsModule } from './tags/tags.module';
 import { GraphsModule } from './graphs/graphs.module';
 import { AggregateModule } from './aggregate/aggregate.module';
+import { HeatmapModule } from './heatmap/heatmap.module';
 
 @Module({
   imports: [ConfigModule.forRoot() ,DatabaseModule, VisitorModule, EventsModule, UsersModule, TypeOrmModule.forRoot(
@@ -24,7 +25,7 @@ import { AggregateModule } from './aggregate/aggregate.module';
       synchronize: true,
       autoLoadEntities: true
     }
-  ), AuthenticationModule, TagsModule, GraphsModule, AggregateModule],
+  ), AuthenticationModule, TagsModule, GraphsModule, AggregateModule, HeatmapModule],
   controllers: [],
   providers: [],
 })

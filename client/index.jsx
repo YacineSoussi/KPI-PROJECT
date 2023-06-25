@@ -8,7 +8,7 @@ const OtherComponent = () => {
   const elementRef2 = useTrackElement("button2", "click");
 
 
-  // useTrackMousemove();
+  useTrackMousemove();
 
   return (
     <>
