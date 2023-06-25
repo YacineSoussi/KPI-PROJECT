@@ -1,8 +1,10 @@
 import { useQueryClient, useMutation, useQuery } from "react-query";
 import jwtDecode from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 const useAuth = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const loginRequest = async (body) => {
     const response = await fetch("http://localhost:3000/auth/login", {
@@ -38,6 +40,7 @@ const useAuth = () => {
   };
   const logout = () => {
     localStorage.removeItem("token");
+    navigate("/login");
     queryClient.invalidateQueries("user");
   };
 
