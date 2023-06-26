@@ -24,11 +24,6 @@ const Header = () => {
                     Tags
                   </Link>
                 </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/kpi">
-                    KPI
-                  </Link>
-                </li>
               </ul>
               <div className="d-flex">
                 <span className="navbar-text me-3">
