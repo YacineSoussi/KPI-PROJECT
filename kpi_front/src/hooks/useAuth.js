@@ -7,7 +7,7 @@ const useAuth = () => {
   const navigate = useNavigate();
 
   const loginRequest = async (body) => {
-    const response = await fetch(`${import.meta.env.API_BASE_URL}/auth/login`, {
+    const response = await fetch(`${process.env.API_BASE_URL}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -45,16 +45,13 @@ const useAuth = () => {
   };
 
   const registerRequest = async (body) => {
-    const response = await fetch(
-      `${import.meta.env.API_BASE_URL}/auth/register`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      }
-    );
+    const response = await fetch(`${process.env.API_BASE_URL}/auth/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message);
@@ -77,7 +74,7 @@ const useAuth = () => {
       return null;
     }
     try {
-      const response = await fetch(`${import.meta.env.API_BASE_URL}/auth/me`, {
+      const response = await fetch(`${process.env.API_BASE_URL}/auth/me`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

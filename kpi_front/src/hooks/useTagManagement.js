@@ -4,7 +4,7 @@ const useTagManagement = () => {
   const queryClient = useQueryClient();
 
   const fetchTags = async () => {
-    const response = await fetch(`${import.meta.env.API_BASE_URL}/tags`, {
+    const response = await fetch(`${process.env.API_BASE_URL}/tags`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -22,7 +22,7 @@ const useTagManagement = () => {
   } = useQuery("tags", fetchTags);
 
   const createTagMutation = useMutation((body) => {
-    return fetch(`${import.meta.env.API_BASE_URL}/tags`, {
+    return fetch(`${process.env.API_BASE_URL}/tags`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,7 +47,7 @@ const useTagManagement = () => {
   };
 
   const editTagMutation = useMutation(({ id, body }) => {
-    return fetch(`${import.meta.env.API_BASE_URL}/tags/${id}`, {
+    return fetch(`${process.env.API_BASE_URL}/tags/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -63,7 +63,7 @@ const useTagManagement = () => {
   });
 
   const deleteTagMutation = useMutation((id) => {
-    return fetch(`${import.meta.env.API_BASE_URL}/tags/${id}`, {
+    return fetch(`${process.env.API_BASE_URL}/tags/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
