@@ -25,7 +25,7 @@ spec:
         - name: POSTGRES_PASSWORD
           value: "postgres"
         - name: POSTGRES_HOST
-          value: "kpi-postgres"
+          value: "kpi-server-postgres"
         - name: POSTGRES_PORT
           value: "5430"
         - name: MONGO_URL
