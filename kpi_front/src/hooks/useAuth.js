@@ -7,7 +7,7 @@ const useAuth = () => {
   const navigate = useNavigate();
 
   const loginRequest = async (body) => {
-    const response = await fetch(`http://35.205.68.3:5000/auth/login`, {
+    const response = await fetch(`http://35.205.68.39:5000/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,7 +47,7 @@ const useAuth = () => {
   const registerRequest = async (body) => {
     console.log(process.env.API_BASE_URL, "process.env.API_BASE_URL");
 
-    const response = await fetch(`http://35.205.68.3:5000/auth/register`, {
+    const response = await fetch(`http://35.205.68.39:5000/auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -76,7 +76,7 @@ const useAuth = () => {
       return null;
     }
     try {
-      const response = await fetch(`http://35.205.68.3:5000/auth/me`, {
+      const response = await fetch(`http://35.205.68.39:5000/auth/me`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
