@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kpi-server
+spec: 
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kpi-server
+  template:
+    metadata:
+      labels:
+        app: kpi-server
+    spec:
+      containers:
+      - name: kpi-server
+        image: yacinesoussi/kpi-server:latest
+        ports:
+        - containerPort: 3010
+        env:
+        - name: KPI_SERVER_PORT
+          value: "3010"
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "postgres"
+        - name: POSTGRES_HOST
+          value: "kpi-postgres"
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: MONGO_URL
+          value: "mongodb://kpi-server-mongo:27017/kpi"
+
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: kpi-server
+labels:
+  app: kpi-server
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 3010
+    targetPort: 3010
+  selector:
+    app: kpi-server
+
+--- 
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: kpi-server
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: kpi-server
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+
+

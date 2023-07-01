@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kpi-front
+spec:
+  selector:
+    matchLabels:
+      app: kpi-front
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kpi-front
+    spec:
+      containers:
+      - name: kpi-front
+        image: yacinesoussi/kpi-front:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: KPI_FRONT_PORT
+          value: "3000"
+        - name: KPI_SERVER_URL
+          value: "http://kpi-server:3010"
+        - name: KPI_SERVER_PORT
+          value: "3010"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kpi-front
+spec:
+  type: LoadBalancer
+  ports: 
+    - name: kpi-front
+      port: 30010
+      targetPort: 3000
+  selector:
+    app: kpi-front
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: kpi-front
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: kpi-front
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50

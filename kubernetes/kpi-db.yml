@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kpi-server-mongo
+spec:
+  selector:
+    matchLabels:
+      app: kpi-server-mongo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kpi-server-mongo
+    spec:
+      containers:
+      - name: kpi-server-mongo
+        image: mongo:latest
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - name: kpi-server-mongo-persistent-storage
+          mountPath: /data/db
+      volumes:
+      - name: kpi-server-mongo-persistent-storage
+        emptyDir: {}
+
+---
+
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: kpi-server-postgres
+spec:
+  selector:
+    matchLabels:
+      app: kpi-server-postgres
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kpi-server-postgres
+    spec:
+      containers:
+      - name: kpi-server-postgres
+        image: postgres:latest
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "postgres"
+        volumeMounts:
+        - name: kpi-server-postgres-persistent-storage
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: kpi-server-postgres-persistent-storage
+        emptyDir: {}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: kpi-server-mongo
+spec:
+  type: ClusterIP
+  selector:
+    app: kpi-server-mongo
+  ports:
+    - name: mongodb
+      port: 27017
+      targetPort: 27017
+  
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: kpi-server-postgres
+spec:
+  type: ClusterIP
+  selector:
+    app: kpi-server-postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+
+
