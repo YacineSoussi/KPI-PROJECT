@@ -24,6 +24,8 @@ spec:
           value: "http://kpi-server:3010"
         - name: KPI_SERVER_PORT
           value: "3010"
+        - name: API_BASE_URL
+          value: "http://kpi-server:3010"
 
 ---
 apiVersion: v1

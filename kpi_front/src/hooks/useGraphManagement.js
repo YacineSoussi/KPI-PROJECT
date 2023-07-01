@@ -4,7 +4,7 @@ const useGraphManagement = () => {
   const queryClient = useQueryClient();
 
   const fetchGraphs = async () => {
-    const response = await fetch("http://localhost:3000/graphs", {
+    const response = await fetch(`${import.meta.env.API_BASE_URL}/graphs`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -21,7 +21,7 @@ const useGraphManagement = () => {
   } = useQuery("graphs", fetchGraphs);
 
   const createGraphMutation = useMutation((body) => {
-    return fetch("http://localhost:3000/graphs", {
+    return fetch(`${import.meta.env.API_BASE_URL}"/graphs`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -46,7 +46,7 @@ const useGraphManagement = () => {
   };
 
   const editGraphMutation = useMutation(({ id, body }) => {
-    return fetch(`http://localhost:3000/graphs/${id}`, {
+    return fetch(`${import.meta.env.API_BASE_URL}/graphs/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -62,7 +62,7 @@ const useGraphManagement = () => {
   });
 
   const deleteGraphMutation = useMutation((id) => {
-    return fetch(`http://localhost:3000/graphs/${id}`, {
+    return fetch(`${import.meta.env.API_BASE_URL}/graphs/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
