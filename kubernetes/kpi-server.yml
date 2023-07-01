@@ -27,7 +27,7 @@ spec:
         - name: POSTGRES_HOST
           value: "kpi-postgres"
         - name: POSTGRES_PORT
-          value: "5432"
+          value: "5430"
         - name: MONGO_URL
           value: "mongodb://kpi-server-mongo:27017/kpi"
 

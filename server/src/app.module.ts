@@ -13,20 +13,30 @@ import { AggregateModule } from './aggregate/aggregate.module';
 import { HeatmapModule } from './heatmap/heatmap.module';
 
 @Module({
-  imports: [ConfigModule.forRoot() ,DatabaseModule, VisitorModule, EventsModule, UsersModule, TypeOrmModule.forRoot(
-    {
+  imports: [
+    ConfigModule.forRoot(),
+    DatabaseModule,
+    VisitorModule,
+    EventsModule,
+    UsersModule,
+    TypeOrmModule.forRoot({
       type: 'postgres',
-      host: "postgres",
-      port: 5432,
-      username: "postgres",
-      password: "postgres",
-      database: "postgres",
+      host: process.env.POSTGRES_HOST || 'postgres',
+      port: 5430,
+      username: process.env.POSTGRES_USER || 'postgres',
+      password: process.env.POSTGRES_PASSWORD || 'postgres',
+      database: process.env.POSTGRES_DB || 'postgres',
       entities: [User],
       synchronize: true,
-      autoLoadEntities: true
-    }
-  ), AuthenticationModule, TagsModule, GraphsModule, AggregateModule, HeatmapModule],
+      autoLoadEntities: true,
+    }),
+    AuthenticationModule,
+    TagsModule,
+    GraphsModule,
+    AggregateModule,
+    HeatmapModule,
+  ],
   controllers: [],
   providers: [],
 })
-export class AppModule  {}
+export class AppModule {}

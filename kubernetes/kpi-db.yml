@@ -44,7 +44,7 @@ spec:
       - name: kpi-server-postgres
         image: postgres:latest
         ports:
-        - containerPort: 5432
+        - containerPort: 5430
         env:
         - name: POSTGRES_USER
           value: "postgres"
@@ -85,7 +85,7 @@ spec:
     app: kpi-server-postgres
   ports:
     - name: postgres
-      port: 5432
-      targetPort: 5432
+      port: 5430
+      targetPort: 5430
 
 
