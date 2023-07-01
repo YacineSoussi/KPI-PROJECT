@@ -46,7 +46,7 @@ const useAuth = () => {
 
   const registerRequest = async (body) => {
     console.log(process.env.API_BASE_URL, "process.env.API_BASE_URL");
-    const response = await fetch(`${process.env.API_BASE_URL}/auth/register`, {
+    const response = await fetch(`/auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -55,7 +55,7 @@ const useAuth = () => {
     });
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message);
+      throw new Error("Erreur lors de l'inscription");
     }
     const data = await response.json();
 
