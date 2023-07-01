@@ -45,6 +45,7 @@ const useAuth = () => {
   };
 
   const registerRequest = async (body) => {
+    console.log(process.env.API_BASE_URL, "process.env.API_BASE_URL");
     const response = await fetch(`${process.env.API_BASE_URL}/auth/register`, {
       method: "POST",
       headers: {
