@@ -25,7 +25,7 @@ spec:
         - name: POSTGRES_HOST
           value: "kpi-server-postgres"
         - name: POSTGRES_PORT
-          value: "5430"
+          value: "5432"
         - name: POSTGRES_POSTGRES_DB
         - name: MONGO_URL
           value: "mongodb://kpi-server-mongo:27018/kpi"
@@ -41,7 +41,7 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-  - port: 3010
+  - port: 3011
     targetPort: 3010
   selector:
     app: kpi-server
