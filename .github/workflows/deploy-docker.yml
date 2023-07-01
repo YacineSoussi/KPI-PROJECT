@@ -76,3 +76,5 @@ jobs:
       - name: Deploy kpi-server
         run: |
           kubectl patch deployment kpi-server -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
+
+          
