@@ -4,7 +4,7 @@ const useTagManagement = () => {
   const queryClient = useQueryClient();
 
   const fetchTags = async () => {
-    const response = await fetch(`http://34.22.164.196:3010/tags`, {
+    const response = await fetch(`http://35.205.68.39:3011/tags`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -22,7 +22,7 @@ const useTagManagement = () => {
   } = useQuery("tags", fetchTags);
 
   const createTagMutation = useMutation((body) => {
-    return fetch(`http://34.22.164.196:3010/tags`, {
+    return fetch(`http://35.205.68.39:3011/tags`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,7 +47,7 @@ const useTagManagement = () => {
   };
 
   const editTagMutation = useMutation(({ id, body }) => {
-    return fetch(`http://34.22.164.196:3010/tags/${id}`, {
+    return fetch(`http://35.205.68.39:3011/tags/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -63,7 +63,7 @@ const useTagManagement = () => {
   });
 
   const deleteTagMutation = useMutation((id) => {
-    return fetch(`http://34.22.164.196:3010/tags/${id}`, {
+    return fetch(`http://35.205.68.39:3011/tags/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

@@ -37,7 +37,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: kpi-server
+  name: kpi-server-external
+  labels:
+    app: kpi-server
 spec:
   type: LoadBalancer
   ports:
@@ -47,6 +49,22 @@ spec:
     app: kpi-server
 
 --- 
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: kpi-server-internal
+  labels:
+    app: kpi-server
+spec: 
+  type: ClusterIP
+  ports:
+  - port: 3011
+    targetPort: 3010
+  selector:
+    app: kpi-server
+
+---
 
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
