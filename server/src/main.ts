@@ -9,5 +9,7 @@ async function bootstrap() {
   app.enableCors();
 
   await app.listen(5000);
+
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
