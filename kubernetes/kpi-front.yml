@@ -16,7 +16,7 @@ spec:
       - name: kpi-front
         image: yacinesoussi/kpi-front:latest
         ports:
-        - containerPort: 3000
+        - containerPort: 8001
         env:
         - name: KPI_FRONT_PORT
           value: "3000"
@@ -35,7 +35,7 @@ spec:
   ports: 
     - name: kpi-front
       port: 3010
-      targetPort: 3000
+      targetPort: 8001
   selector:
     app: kpi-front
 
