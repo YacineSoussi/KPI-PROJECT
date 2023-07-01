@@ -1,6 +1,4 @@
 import "./App.css";
-import Dashboard from "./pages/Dashboard";
-import Header from "./components/common/Header";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { router } from "./router/router";
 import { RouterProvider } from "react-router";

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Graph from "../components/graphs/Graph";
 import DashboardForm from "../components/forms/DashboardForm";
-import TagForm from "../components/forms/TagForm";
 import useTagManagement from "../hooks/useTagManagement";
 import TagsList from "../components/tags/TagsList";
 import Header from "../components/common/Header";
@@ -9,28 +8,9 @@ import ApiKey from "../components/ApiKey";
 import useGraphManagement from "../hooks/useGraphManagement";
 
 const Dashboard = () => {
-  const {
-    tags,
-    tagsLoading,
-    tagsError,
-    refetchTags,
-    onAdd,
-    onEdit,
-    onDelete,
-    updatedGraphs,
-  } = useTagManagement();
+  const { tags, tagsLoading, onAdd, onEdit, onDelete } = useTagManagement();
 
-  const {
-    graphs,
-    graphsLoading,
-    graphsError,
-    refetchGraphs,
-    onAdd: onAddGraph,
-    editGraphMutation,
-    onDelete: onDeleteGraph,
-  } = useGraphManagement();
-
-  const selectedMetric = "clickRate";
+  const { graphs, onAdd: onAddGraph } = useGraphManagement();
 
   return (
     <>

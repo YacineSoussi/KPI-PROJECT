@@ -1,9 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "react-query";
-import useAuth from "./useAuth";
 
 const useGraphManagement = () => {
   const queryClient = useQueryClient();
-  const { user } = useAuth();
 
   const fetchGraphs = async () => {
     const response = await fetch("http://localhost:3000/graphs", {

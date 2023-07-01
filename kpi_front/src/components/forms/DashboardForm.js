@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useQuery } from "react-query";
 
 function DashboardForm({ tags, onAdd }) {
   const [selectedMetric, setSelectedMetric] = useState("clickRate");

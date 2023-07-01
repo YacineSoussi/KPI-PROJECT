@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useQuery } from "react-query";
 
 const TagForm = ({ onAdd, setIsAdding }) => {
   const [tagName, setTagName] = useState("");

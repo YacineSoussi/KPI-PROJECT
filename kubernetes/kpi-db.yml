@@ -69,7 +69,7 @@ spec:
     app: kpi-server-mongo
   ports:
     - name: mongodb
-      port: 27017
+      port: 27018
       targetPort: 27017
   
 
