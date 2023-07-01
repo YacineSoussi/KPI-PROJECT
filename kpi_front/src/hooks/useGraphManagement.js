@@ -4,7 +4,7 @@ const useGraphManagement = () => {
   const queryClient = useQueryClient();
 
   const fetchGraphs = async () => {
-    const response = await fetch(`http://35.205.68.39:3011/graphs`, {
+    const response = await fetch(`http://35.205.68.3:5000/graphs`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -21,7 +21,7 @@ const useGraphManagement = () => {
   } = useQuery("graphs", fetchGraphs);
 
   const createGraphMutation = useMutation((body) => {
-    return fetch(`http://35.205.68.39:3011"/graphs`, {
+    return fetch(`http://35.205.68.3:5000"/graphs`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -46,7 +46,7 @@ const useGraphManagement = () => {
   };
 
   const editGraphMutation = useMutation(({ id, body }) => {
-    return fetch(`http://35.205.68.39:3011/graphs/${id}`, {
+    return fetch(`http://35.205.68.3:5000/graphs/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -62,7 +62,7 @@ const useGraphManagement = () => {
   });
 
   const deleteGraphMutation = useMutation((id) => {
-    return fetch(`http://35.205.68.39:3011/graphs/${id}`, {
+    return fetch(`http://35.205.68.3:5000/graphs/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

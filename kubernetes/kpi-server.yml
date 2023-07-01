@@ -16,7 +16,7 @@ spec:
       - name: kpi-server
         image: yacinesoussi/kpi-server:latest
         ports:
-        - containerPort: 3010
+        - containerPort: 5000
         env:
         - name: POSTGRES_USER
           value: "postgres"
@@ -43,8 +43,8 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-  - port: 3011
-    targetPort: 3010
+  - port: 5000
+    targetPort: 5000
   selector:
     app: kpi-server
 
@@ -59,8 +59,8 @@ metadata:
 spec: 
   type: ClusterIP
   ports:
-  - port: 3011
-    targetPort: 3010
+  - port: 5000
+    targetPort: 5000
   selector:
     app: kpi-server
 
