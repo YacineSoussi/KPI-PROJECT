@@ -21,7 +21,7 @@ const useGraphManagement = () => {
   } = useQuery("graphs", fetchGraphs);
 
   const createGraphMutation = useMutation((body) => {
-    return fetch(`http://35.205.68.39:5000"/graphs`, {
+    return fetch(`http://35.205.68.39:5000/graphs`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
