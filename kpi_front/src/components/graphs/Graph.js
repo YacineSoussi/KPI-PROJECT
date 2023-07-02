@@ -28,9 +28,11 @@ const Graph = ({ userGraphs }) => {
             </div>
           );
         })}
-      {userGraphs.length === 0 && (
-        <p className="w-100">Aucun graphique pour cet utilisateur</p>
-      )}
+      {
+        !userGraphs(
+          <p className="w-100">Aucun graphique pour cet utilisateur</p>
+        )
+      }
     </div>
   );
 };
