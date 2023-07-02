@@ -41,7 +41,7 @@ function DashboardForm({ tags, onAdd }) {
           </select>
         </div>
 
-        {selectedMetric === "clickRate" && (
+        {selectedMetric === "clickRate" && tags && (
           <div className="form-group">
             <label>Tag :</label>
             <select
@@ -49,12 +49,11 @@ function DashboardForm({ tags, onAdd }) {
               className="form-control"
               name="tag"
             >
-              {tags &&
-                tags.map((tag) => (
-                  <option key={tag._id} value={tag.name}>
-                    {tag.name}
-                  </option>
-                ))}
+              {tags.map((tag) => (
+                <option key={tag._id} value={tag.name}>
+                  {tag.name}
+                </option>
+              ))}
             </select>
           </div>
         )}
