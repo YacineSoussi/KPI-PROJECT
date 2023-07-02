@@ -38,10 +38,6 @@ function DashboardForm({ tags, onAdd }) {
             <option value="clickRate">Nombre de clics</option>
             <option value="pageViews">Nombre de pages vues</option>
             <option value="bounceRate">Taux de rebond</option>
-            {/* <option value="averageSessionDuration">
-              Durée moyenne de session
-            </option>
-            <option value="session">Sessions</option> */}
           </select>
         </div>
 
