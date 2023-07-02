@@ -2,7 +2,9 @@ import React, { useState } from "react";
 
 function DashboardForm({ tags, onAdd }) {
   const [selectedMetric, setSelectedMetric] = useState("clickRate");
-  const [selectedTag, setSelectedTag] = useState(tags[0].name);
+  const [selectedTag, setSelectedTag] = useState(
+    tags && tags.length > 0 ? tags[0].name : null
+  );
   const [selectedChartType, setSelectedChartType] = useState("line");
   const [selectedTimePeriod, setSelectedTimePeriod] = useState("month");
 
@@ -51,11 +53,12 @@ function DashboardForm({ tags, onAdd }) {
               className="form-control"
               name="tag"
             >
-              {tags.map((tag) => (
-                <option key={tag._id} value={tag.name}>
-                  {tag.name}
-                </option>
-              ))}
+              {tags &&
+                tags.map((tag) => (
+                  <option key={tag._id} value={tag.name}>
+                    {tag.name}
+                  </option>
+                ))}
             </select>
           </div>
         )}
